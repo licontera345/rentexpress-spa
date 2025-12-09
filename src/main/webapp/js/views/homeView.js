@@ -8,12 +8,7 @@ const HomeView = {
             return;
         }
 
-        const html = `
-            <div class="home-intro">
-                <h2>Bienvenido a RentExpress</h2>
-                <p>Consulta el catálogo público de vehículos disponibles.</p>
-            </div>
-        `;
+        const html = ``;
 
         c.innerHTML = html;
     }
