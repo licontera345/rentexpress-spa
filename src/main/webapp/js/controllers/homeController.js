@@ -4,8 +4,11 @@ const HomeController = {
 
     init() {
         HomeView.render();
+        this.setupEventListeners();
+    },
+    setupEventListeners() {
+ 
     }
-
 };
 
 export default HomeController;

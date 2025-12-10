@@ -8,7 +8,7 @@ const HomeView = {
             return;
         }
 
-        const html = ``;
+        const html = ` `;
 
         c.innerHTML = html;
     }

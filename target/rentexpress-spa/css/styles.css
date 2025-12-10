@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.bgheader {
+  background-color: lightgrey;
+}
+
+.bgmain {
+  background-color: lightyellow;
+  padding: 1%;
+}
+
+
+.character {
+  display: inline-block;
+  width: 160px;
+  margin: 15px;
+  text-align: center;
+}
+
+.character h2 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.char-img {
+  width: 120px;
+  height: 160px;
+  object-fit: cover; 
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.continent-image {
+  width: 250px;
+  border-radius: 5px;
+  border: 2px solid #ddd;
+}
+
+#charModalContent img {
+  width: 180px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  display: block;
+  margin: 10px auto 0;
+}

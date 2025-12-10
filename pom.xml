@@ -10,20 +10,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- No necesitamos versiones de Java ni compilador para un proyecto estático -->
     </properties>
-
-    <!-- 
-      EN UNA SPA, NO DEBERÍAS TENER DEPENDENCIAS DE LIBRERÍAS BACKEND 
-      (MySQL, Log4j2, JSTL, Jersey Client, etc.)
-      Tu SPA interactúa con el Backend *solo* a través de llamadas HTTP/AJAX (Fetch/Axios).
-    -->
     <dependencies>
-        <!-- 
-          La única dependencia que podrías necesitar es la API de Servlets, 
-          marcada como "provided", si usas un contenedor como Tomcat 
-          simplemente para servir los archivos estáticos.
-        -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
@@ -35,16 +23,10 @@
     <build>
         <finalName>rentexpress-spa</finalName>
         <plugins>
-            <!-- 1. Limpia el directorio de destino antes de construir -->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.4.0</version>
             </plugin>
-
-            <!-- 
-              2. Copia los recursos de tu SPA (archivos HTML, CSS, JS que genera tu CLI de JS)
-              desde el directorio 'dist' (o 'build') a la raíz del WAR.
-            -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
@@ -56,30 +38,23 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <!-- Directorio donde tu framework JS (React/Angular/Vue) genera los archivos finales -->
                             <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <!-- Reemplaza 'src/main/frontend/dist' por tu ruta real (ej: dist/my-app) -->
-                                    <directory>src/main/frontend/dist</directory> 
+                                    <directory>src/main/webapp</directory> 
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- 3. Empaqueta todo en un archivo .war -->
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <!-- Como es una SPA pura, no necesitamos un web.xml tradicional -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-            
-            <!-- Plugins estándar de Maven (sin cambios) -->
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>3.1.2</version>

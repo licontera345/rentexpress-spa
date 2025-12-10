@@ -8,14 +8,22 @@ const CatalogVehicleController = {
         this.loadCatalog();
     },
 
-    loadCatalog() {
-        CatalogVehicleService.getVehicles()
-            .then(function (vehicles) {
-                CatalogVehicleView.render(vehicles);
-            })
-            .catch(function () {
-                CatalogVehicleView.renderError("No se pudo cargar el catálogo");
-            });
+    async loadCatalog() {
+        try {
+           const vehicles = await CatalogVehicleService.getVehicles();
+           CatalogVehicleView.render(vehicles.results);
+        }catch (error) {
+            CatalogVehicleView.renderError("No se pudo cargar el catálogo");
+            return; 
+        }
+
+        // CatalogVehicleService.getVehicles()
+        //     .then(function (vehicles) {
+        //         CatalogVehicleView.render(vehicles);
+        //     })
+        //     .catch(function () {
+        //         CatalogVehicleView.renderError("No se pudo cargar el catálogo");
+        //     });
     }
 
 };
