@@ -9,18 +9,29 @@ const CatalogVehicleView = {
         const count = document.querySelector(this.count);
         const status = document.querySelector(this.status);
 
-        if (!container || !count || !status) return;
+        if (!container || !count || !status) {
+            console.error("Contenedores del catálogo no encontrados");
+            return;
+        }
 
         let html = "";
 
         if (Array.isArray(vehicles) && vehicles.length > 0) {
+            console.log(`Renderizando ${vehicles.length} vehículos`);
 
             for (let i = 0; i < vehicles.length; i++) {
                 const v = vehicles[i];
 
-                const brand = v.brand;
-                const model = v.model;
-                const plate = v.licensePlate;
+                const brand = v.brand || '';
+                const model = v.model || '';
+                const plate = v.licensePlate || '';
+                const vehicleId = v.vehicleId;
+                
+                if (!vehicleId) {
+                    console.warn("Vehículo sin ID:", v);
+                    continue;
+                }
+                
                 let name = "";
 
                 if (brand && model && plate) {
@@ -37,7 +48,7 @@ const CatalogVehicleView = {
                     name = "Vehículo sin nombre";
                 }
 
-                html += `<li class='catalog-item'>${name}</li>`;
+                html += `<li class='catalog-item' data-vehicle-id='${vehicleId}'>${name}</li>`;
             }
 
             container.innerHTML = html;
@@ -45,6 +56,7 @@ const CatalogVehicleView = {
             status.textContent = "";
 
         } else {
+            console.warn("No hay vehículos para mostrar");
             container.innerHTML = "<li class='catalog-empty'>No se encontraron vehículos.</li>";
             count.textContent = "";
             status.textContent = "";
@@ -71,6 +83,7 @@ const CatalogVehicleView = {
         if (!container || !count || !status) return;
 
         status.textContent = msg;
+        status.style.color = "red";
         container.innerHTML = "";
         count.textContent = "";
     }

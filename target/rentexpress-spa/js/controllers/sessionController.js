@@ -34,16 +34,6 @@ const sessionController = {
         return localStorage.getItem("token");
     },
 
-
-    getCartLocal: function () {
-        return JSON.parse(localStorage.getItem("cartlocal"));
-    },
-
-
-    setCartLocal: function (cart) {
-        localStorage.setItem("cartlocal", JSON.stringify(cart));
-    }
-
 };
 
 export default sessionController;
