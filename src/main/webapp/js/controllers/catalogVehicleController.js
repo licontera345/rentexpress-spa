@@ -5,15 +5,14 @@ import VehicleDetailController from "./vehicleDetailController.js";
 const CatalogVehicleController = {
 
     init() {
-        CatalogVehicleView.renderLoading();
         this.loadCatalog();
+        
     },
 
     async loadCatalog() {
         try {
             const vehicles = await CatalogVehicleService.getVehicles();
             CatalogVehicleView.render(vehicles.results);
-            // Esperar a que el DOM se actualice antes de agregar listeners
             setTimeout(() => this.setupEventListeners(), 100);
         } catch (error) {
             console.error("Error cargando catálogo:", error);

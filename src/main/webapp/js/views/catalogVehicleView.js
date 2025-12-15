@@ -62,31 +62,6 @@ const CatalogVehicleView = {
             status.textContent = "";
         }
     },
-
-    renderLoading() {
-        const container = document.querySelector(this.container);
-        const count = document.querySelector(this.count);
-        const status = document.querySelector(this.status);
-
-        if (!container || !count || !status) return;
-
-        status.textContent = "Cargando catálogo...";
-        container.innerHTML = "";
-        count.textContent = "";
-    },
-
-    renderError(msg) {
-        const container = document.querySelector(this.container);
-        const count = document.querySelector(this.count);
-        const status = document.querySelector(this.status);
-
-        if (!container || !count || !status) return;
-
-        status.textContent = msg;
-        status.style.color = "red";
-        container.innerHTML = "";
-        count.textContent = "";
-    }
 };
 
 export default CatalogVehicleView;

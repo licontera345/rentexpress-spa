@@ -7,7 +7,7 @@ getVehicles : function(){
           type: "GET",
           url: Global.API + "/vehicles/open/search?pageNumber=1&pageSize=25",
           async: true,
-          dataType: "json", // expected response data
+          dataType: "json",
           statusCode: {
             200: function(data) {
                 resolve(data);},
