@@ -20,6 +20,7 @@ export class CatalogVehicleView {
         if (this.listContainer) {
             this.listContainer.innerHTML = vehicles.map(v => `
                 <li class="catalog-item" data-vehicle-id="${v.vehicleId}">
+                 <img src="./img/default.jpg" alt="${v.brand} ${v.model}">
                     <h3>${v.brand} ${v.model} (${v.manufactureYear})</h3>
                     <p>Matrícula: ${v.licensePlate}</p>
                     <p>KM: ${v.currentMileage}</p>

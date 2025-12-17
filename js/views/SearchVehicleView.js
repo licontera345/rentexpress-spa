@@ -1,3 +1,6 @@
+import AddressService from "../services/AddressService.js";
+import sessionController from "../controllers/SessionController.js";
+
 export class SearchVehicleView {
     constructor() {
         this.containerSelector = "#search-panel";
@@ -8,14 +11,10 @@ export class SearchVehicleView {
         if (!this.$container) return;
 
         const options = headquarters.map(hq => {
-            const addr = hq.addresses?.[0] || {};
             return `
                 <option value="${hq.id}"
                     data-name="${hq.name || ''}"
-                    data-street="${addr.street || ''}"
-                    data-number="${addr.number || ''}"
-                    data-city="${hq.city?.cityName || ''}"
-                    data-province="${hq.province?.provinceName || ''}">
+                    data-address-id="${hq.addressId || ''}">
                     ${hq.name}
                 </option>
             `;
@@ -62,27 +61,59 @@ export class SearchVehicleView {
                 <button id="search-vehicles-btn">BUSCAR</button>
             </div>
 
-            <div id="pickup-hq-details"></div>
-            <div id="return-hq-details"></div>
+            <div id="pickup-hq-details" class="hq-details"></div>
+            <div id="return-hq-details" class="hq-details"></div>
         `;
     }
 
-    showHeadquarterDetails(select, detailsId) {
+    async showHeadquarterDetails(select, detailsId) {
         const detailsElement = document.getElementById(detailsId);
         if (!detailsElement) return;
 
-        const selectedOption = select.options[select.selectedIndex];
-
-        if (!selectedOption.value) {
+        const hqId = select.value;
+        if (!hqId) {
             detailsElement.innerHTML = "";
+            detailsElement.style.display = "none";
             return;
         }
 
-        detailsElement.innerHTML = `
-            <strong>${selectedOption.dataset.name}</strong><br>
-            ${selectedOption.dataset.street} ${selectedOption.dataset.number}<br>
-            ${selectedOption.dataset.city}, ${selectedOption.dataset.province}
-        `;
+        const selectedOption = Array.from(select.options).find(opt => opt.value === hqId);
+        if (!selectedOption) return;
+
+        const name = selectedOption.dataset.name || "Sede sin nombre";
+        const addressId = selectedOption.dataset.addressId;
+
+        let html = `<strong>${name}</strong><br>`;
+
+        if (!addressId) {
+            html += "<em>Dirección no disponible</em>";
+        } else {
+            // Intentamos cargar la dirección solo si hay token (usuario logueado)
+            const token = sessionController.getToken ? sessionController.getToken() : sessionController.token;
+            if (token) {
+                try {
+                    const addr = await AddressService.findById(addressId, token);
+
+                    const addressLine = [addr.street, addr.number].filter(Boolean).join(" ").trim();
+                    if (addressLine) html += addressLine + "<br>";
+
+                    const locationLine = [addr.cityName, addr.provinceName].filter(Boolean).join(", ").trim();
+                    if (locationLine) html += locationLine;
+
+                    if (!addressLine && !locationLine) {
+                        html += "<em>Dirección no disponible</em>";
+                    }
+                } catch (e) {
+                    console.error("Error al cargar dirección:", e);
+                    html += "<em>Error al cargar la dirección</em>";
+                }
+            } else {
+                html += "<em>Inicia sesión como empleado para ver la dirección</em>";
+            }
+        }
+
+        detailsElement.innerHTML = html;
+        detailsElement.style.display = "block";
     }
 
     getSearchParams() {
@@ -96,10 +127,11 @@ export class SearchVehicleView {
         };
     }
 
-    show() { if (this.$container) this.$container.style.display = "block";
+    show() { 
+        if (this.$container) this.$container.style.display = "block"; 
     }
 
-    hide() {
-        if (this.$container) this.$container.style.display = "none";
+    hide() { 
+        if (this.$container) this.$container.style.display = "none"; 
     }
 }

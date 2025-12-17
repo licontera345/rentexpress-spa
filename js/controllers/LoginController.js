@@ -5,12 +5,14 @@ export class LoginController {
     constructor(view, router) {
         this.view = view;
         this.router = router;
+        this.modal = document.getElementById("loginModal");
     }
 
     init() {
         this.view.render();
         this.updateUI();
-        this.setupListeners();
+        this.setupGlobalListeners();  
+        this.setupFormListeners();  
     }
 
     updateUI() {
@@ -18,25 +20,73 @@ export class LoginController {
 
         const btnLogin = document.getElementById("btnLogin");
         const btnLogout = document.getElementById("btnLogout");
-        const loginSec = document.querySelector('.login-section');
-        const catalogSec = document.querySelector('.catalog-section');
         const logoutView = document.getElementById("logoutFromView");
 
         if (btnLogin) btnLogin.style.display = isLogged ? "none" : "inline-block";
         if (btnLogout) btnLogout.style.display = isLogged ? "inline-block" : "none";
-        if (loginSec) loginSec.style.display = isLogged ? "none" : "block";
-        if (catalogSec) catalogSec.style.gridColumn = isLogged ? "1 / -1" : "auto";
         if (logoutView) logoutView.style.display = isLogged ? "block" : "none";
+
+        // Si está logueado, cerramos el modal por si estaba abierto
+        if (isLogged && this.modal) {
+            this.modal.classList.remove("active");
+        }
     }
 
-    setupListeners() {
-        // Usamos this.view.$container para delegar eventos (más seguro después de render)
-        if (!this.view.$container) return;
+    setupGlobalListeners() {
+        const btnLogin = document.getElementById("btnLogin");
+        if (btnLogin) {
+            btnLogin.addEventListener("click", (e) => {
+                e.preventDefault();
+                this.modal?.classList.add("active");
+                this.view.render();
+            });
+        }
 
-        this.view.$container.onclick = async (e) => {
-            const id = e.target.id;
+        // Cerrar modal con la X
+        const closeBtn = this.modal?.querySelector(".btn-close");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                this.modal.classList.remove("active");
+            });
+        }
 
-            if (id === "loginButton") {
+        // Cerrar modal clicando fuera
+        if (this.modal) {
+            this.modal.addEventListener("click", (e) => {
+                if (e.target === this.modal) {
+                    this.modal.classList.remove("active");
+                }
+            });
+        }
+
+        // Botón Logout del header
+        const btnLogout = document.getElementById("btnLogout");
+        if (btnLogout) {
+            btnLogout.addEventListener("click", (e) => {
+                e.preventDefault();
+                sessionController.logOut();
+                this.updateUI();
+                if (this.router) this.router.goTo('home');
+            });
+        }
+
+        // Botón Cerrar Sesión dentro del modal
+        const logoutView = document.getElementById("logoutFromView");
+        if (logoutView) {
+            logoutView.addEventListener("click", () => {
+                sessionController.logOut();
+                this.updateUI();
+                if (this.router) this.router.goTo('home');
+            });
+        }
+    }
+
+    // Eventos dentro del formulario de login
+    setupFormListeners() {
+        this.view.$container.addEventListener("click", async (e) => {
+            if (e.target.id === "loginButton") {
+                e.preventDefault();
+
                 const username = document.getElementById("username")?.value.trim();
                 const password = document.getElementById("password")?.value;
                 const type = document.querySelector('input[name="loginType"]:checked')?.value || "user";
@@ -58,8 +108,11 @@ export class LoginController {
                     sessionController.setLoggedInUser({ username, loginType: type }, data.token);
                     this.updateUI();
 
-                    // Opcional: ir al catálogo o home después de login
-                    // this.router?.goTo('catalog');
+                    // Cerrar modal tras login exitoso
+                    this.modal?.classList.remove("active");
+
+                    // Opcional: ir al catálogo
+                    // if (this.router) this.router.goTo('catalog');
                 } catch (error) {
                     if (out) {
                         out.textContent = "Error: " + (error.message || "Credenciales inválidas");
@@ -67,22 +120,15 @@ export class LoginController {
                     }
                 }
             }
-
-            if (id === "btnLogout" || id === "logoutFromView") {
-                sessionController.logOut();
-                this.updateUI();
-                if (this.router) {
-                    this.router.goTo('home');
-                }
-            }
-        };
+        });
     }
 
     show() {
-        this.view.show();
+        this.modal?.classList.add("active");
+        this.view.render();
     }
 
     hide() {
-        this.view.hide();
+        this.modal?.classList.remove("active");
     }
 }

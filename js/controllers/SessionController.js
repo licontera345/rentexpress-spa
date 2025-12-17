@@ -17,6 +17,10 @@ export class SessionController {
         const user = localStorage.getItem("loggedInUser");
         return user ? JSON.parse(user) : null;
     }
+
+    getToken() {
+        return localStorage.getItem("token");
+    }
 }
 
 export default new SessionController();

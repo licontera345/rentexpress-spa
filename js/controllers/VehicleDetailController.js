@@ -18,7 +18,7 @@ export class VehicleDetailController {
 
         modal.onclick = (e) => {
             if (e.target.classList.contains("btn-close") || e.target === modal) {
-                modal.classList.remove("show");
+                modal.classList.remove("active");
             }
         };
     }
@@ -27,7 +27,7 @@ export class VehicleDetailController {
         const modal = document.getElementById("vehicleModal");
         if (!modal) return;
 
-        modal.classList.add("show");
+        modal.classList.add("active");
 
         try {
             const vehicle = await VehicleService.findById(vehicleId);

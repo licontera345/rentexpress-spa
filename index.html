@@ -25,23 +25,15 @@
                 <h1>RentExpress</h1>
             </div>
             <nav>
-                <a href="#home" id="btnLogin">Login</a>
+                <a href="#" id="btnLogin">Login</a>
                 <a href="#" id="btnLogout" style="display: none;">Logout</a>
             </nav>
         </header>
-        <section id="search-panel">    
-        </section>
+
+        <section id="search-panel"></section>
 
         <main>
-            <aside class="login-section">
-                <div class="login-container">
-                    <div id="login-view">
-                    </div>
-                    <button id="logoutFromView" class="btn-logout" style="display: none;">
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </aside>
+            <!-- Ya no hay aside con login -->
             <section class="catalog-section" id="catalog-section" style="display: none;">
                 <h2>Vehículos Disponibles</h2>
                 <div class="catalog-panel">
@@ -49,9 +41,11 @@
                     <ul id="vehicle-list" class="catalog-list"></ul>
                 </div>
             </section>
-            <section id="home-view">
-            </section>
+
+            <section id="home-view"></section>
         </main>
+
+        <!-- Modal de Detalle de Vehículo (ya lo tenías) -->
         <div id="vehicleModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -59,7 +53,25 @@
                         <h5 class="modal-title">Detalles del Vehículo</h5>
                         <button type="button" class="btn-close" aria-label="Cerrar">×</button>
                     </div>
-                    <div class="modal-body" id="modal-body">
+                    <div class="modal-body" id="modal-body"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVO: Modal de Login -->
+        <div id="loginModal" class="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Iniciar Sesión</h5>
+                        <button type="button" class="btn-close" aria-label="Cerrar">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="login-view"></div>
+                        <button id="logoutFromView" class="btn-logout"
+                            style="display: none; width: 100%; margin-top: 20px;">
+                            Cerrar Sesión
+                        </button>
                     </div>
                 </div>
             </div>

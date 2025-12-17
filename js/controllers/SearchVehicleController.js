@@ -25,20 +25,30 @@ export class SearchVehicleController {
     }
 
     setupListeners() {
-        const pickupSelect = document.getElementById("pickup-headquarters");
-        const returnSelect = document.getElementById("return-headquarters");
-        const searchBtn = document.getElementById("search-vehicles-btn");
-
-        if (pickupSelect) {
-            pickupSelect.onchange = (e) =>
+        this.view.$container.addEventListener("change", (e) => {
+            if (e.target.id === "pickup-headquarters") {
                 this.view.showHeadquarterDetails(e.target, "pickup-hq-details");
-        }
-        if (returnSelect) {
-            returnSelect.onchange = (e) =>
+            }
+            if (e.target.id === "return-headquarters") {
                 this.view.showHeadquarterDetails(e.target, "return-hq-details");
+            }
+        });
+
+        this.view.$container.addEventListener("click", (e) => {
+            if (e.target.id === "search-vehicles-btn") {
+                e.preventDefault();
+                this.handleSearch();
+            }
+        });
+
+        const pickup = document.getElementById("pickup-headquarters");
+        const returnHq = document.getElementById("return-headquarters");
+
+        if (pickup && pickup.value) {
+            this.view.showHeadquarterDetails(pickup, "pickup-hq-details");
         }
-        if (searchBtn) {
-            searchBtn.onclick = () => this.handleSearch();
+        if (returnHq && returnHq.value) {
+            this.view.showHeadquarterDetails(returnHq, "return-hq-details");
         }
     }
 
@@ -53,11 +63,7 @@ export class SearchVehicleController {
                 pageSize: 25
             });
 
-            // Usamos la instancia inyectada
             this.catalogController.displaySearchResults(results.results || []);
-            
-            // Opcional: navegar al catálogo
-            // this.router?.goTo('catalog');
         } catch (error) {
             console.error("Error en búsqueda:", error);
             this.catalogController.displaySearchResults([]);

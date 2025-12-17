@@ -1,4 +1,9 @@
-* {
+/* ==========================================================================
+   RESET Y BASE
+   ========================================================================== */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -7,8 +12,9 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     background: #f8fafc;
-    min-height: 100vh;
     color: #1e293b;
+    min-height: 100vh;
+    line-height: 1.6;
 }
 
 #app {
@@ -17,64 +23,78 @@ body {
     padding: 20px;
 }
 
-/* Header */
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
 header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background: white;
-    padding: 24px 32px;
+    padding: 20px 32px;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 32px;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-logo {
+    height: 98px;
+    width: auto;
 }
 
 header h1 {
-    margin-bottom: 12px;
-}
-
-header nav {
-    display: flex;
-    gap: 20px;
+    font-size: 1.8rem;
+    color: #0f172a;
 }
 
 header nav a {
     color: #64748b;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }
 
 header nav a:hover {
     color: #380cd8;
+    background: rgba(56, 12, 216, 0.08);
 }
 
-/* ==================== PANEL DE BÚSQUEDA ==================== */
+/* ==========================================================================
+   PANEL DE BÚSQUEDA
+   ========================================================================== */
 #search-panel {
     background: white;
     padding: 32px;
     border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     margin-bottom: 32px;
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 16px;
     align-items: flex-end;
 }
 
 .search-field-wrapper {
-    flex: 1;
-    min-width: 150px;
+    flex: 1 1 180px;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
 .search-field-wrapper.small {
-    flex: 0.7;
-    min-width: 110px;
+    flex: 0.8 1 120px;
 }
 
 .search-field-wrapper.button {
-    flex: 0.8;
-    min-width: 140px;
+    flex: 0 1 160px;
 }
 
 .search-field-label {
@@ -82,18 +102,23 @@ header nav a:hover {
     font-weight: 600;
     color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
+    letter-spacing: 0.6px;
 }
 
 #search-panel select,
 #search-panel input {
-    width: 100%;
     padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
     font-size: 0.95rem;
-    transition: all 0.3s;
+    font-weight: 600;
+    color: #1e293b;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+#search-panel select {
+    cursor: pointer;
 }
 
 #search-panel select:hover,
@@ -105,32 +130,20 @@ header nav a:hover {
 #search-panel input:focus {
     outline: none;
     border-color: #2f13cf;
-    box-shadow: 0 0 0 3px rgba(56, 12, 221, 0.1);
-}
-
-#search-panel select {
-    cursor: pointer;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-#search-panel input[type="date"],
-#search-panel input[type="time"] {
-    font-weight: 600;
-    color: #1e293b;
+    box-shadow: 0 0 0 4px rgba(56, 12, 221, 0.15);
 }
 
 /* Detalles de sede */
 #pickup-hq-details,
 #return-hq-details {
     flex-basis: 100%;
-    width: 100%;
-    padding: 12px;
+    padding: 14px 16px;
     background: #f1f5f9;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    border-radius: 8px;
+    border-left: 4px solid #380cd8;
+    font-size: 0.9rem;
     color: #475569;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 #pickup-hq-details:empty,
@@ -140,198 +153,122 @@ header nav a:hover {
 
 #pickup-hq-details strong,
 #return-hq-details strong {
-    color: #1e293b;
+    color: #0f172a;
+    font-size: 1.05rem;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
-/* Botón de búsqueda */
+/* Botón buscar */
 #search-vehicles-btn {
     width: 100%;
-    padding: 12px 24px;
-    background: #3107ee;
+    padding: 14px 24px;
+    margin-top: 22px;
+    background: linear-gradient(135deg, #380cd8 0%, #2e04c5 100%);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 22px;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 #search-vehicles-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(49, 7, 238, 0.3);
-    background: linear-gradient(135deg, #537fdf 0%, #2e04c5 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(49, 7, 238, 0.3);
 }
 
 #search-vehicles-btn:active {
     transform: translateY(0);
 }
 
-#search-vehicles-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-/* ==================== LAYOUT PRINCIPAL ==================== */
+/* ==========================================================================
+   LAYOUT PRINCIPAL - UNA SOLA COLUMNA SIEMPRE
+   ========================================================================== */
 main {
     display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr;        /* Siempre una columna */
+    gap: 32px;
 }
 
-/* ==================== LOGIN ==================== */
-.login-section {
+/* Catálogo siempre ocupa todo el ancho disponible */
+.catalog-section {
+    grid-column: 1 / -1;
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 32px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: fit-content;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.login-container h2 {
-    font-size: 1.5rem;
+.catalog-section h2 {
+    font-size: 2rem;
     margin-bottom: 24px;
     color: #0f172a;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #475569;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.btn-primary {
-    width: 100%;
-    padding: 12px 24px;
-    background: #667eea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
-}
-
-/* ==================== CATÁLOGO ==================== */
-.catalog-section {
-    background: white;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.catalog-section h2 {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    color: #0f172a;
-}
-
-.catalog-status {
-    padding: 12px 16px;
-    background: #f1f5f9;
-    border-radius: 8px;
-    color: #64748b;
-    margin-bottom: 16px;
-}
-
 .catalog-count {
-    font-weight: 600;
-    color: #3b0edf;
-    margin-bottom: 20px;
     font-size: 1.1rem;
+    font-weight: 600;
+    color: #380cd8;
+    margin-bottom: 24px;
 }
 
 .catalog-list {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
 }
 
 .catalog-list li {
     background: #f8fafc;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 0;
-    transition: all 0.3s;
-    cursor: pointer;
+    border-radius: 12px;
     overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .catalog-list li:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    border-color: #1e0ace;
+    transform: translateY(-6px);
+    border-color: #380cd8;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
 
 .vehicle-card {
-    padding: 20px;
+    padding: 24px;
 }
 
 .vehicle-header {
     display: flex;
     justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
+    align-items: flex-start;
     padding-bottom: 16px;
+    margin-bottom: 16px;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .vehicle-name {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: #1e293b;
-    margin: 0;
+    color: #0f172a;
 }
 
 .vehicle-year {
-    background: #f1f5f9;
-    padding: 4px 12px;
-    border-radius: 12px;
+    background: #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #64748b;
-}
-
-.vehicle-info {
-    margin-bottom: 16px;
+    color: #475569;
 }
 
 .vehicle-info p {
-    margin: 8px 0;
-    font-size: 0.9rem;
+    margin: 10px 0;
+    font-size: 0.95rem;
     color: #64748b;
 }
 
@@ -344,73 +281,73 @@ main {
 }
 
 .price-label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #64748b;
 }
 
 .price-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #3412cc;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #380cd8;
 }
 
+/* Estados vacíos */
 .catalog-empty,
 .catalog-error {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 60px 40px;
-    color: #64748b;
-    font-size: 1.2rem;
+    padding: 80px 40px;
     background: #f8fafc;
-    border-radius: 12px;
-    border: 2px dashed #e2e8f0;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    color: #64748b;
+    font-size: 1.3rem;
 }
 
 .catalog-error {
-    color: #ef4444;
     background: #fef2f2;
     border-color: #fca5a5;
+    color: #dc2626;
 }
 
-/* Modal */
+/* ==========================================================================
+   MODALES GENÉRICOS (base compartida)
+   ========================================================================== */
 .modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.7);
+    inset: 0;
     z-index: 1000;
+    background: rgba(0, 0, 0, 0.6);
     align-items: center;
     justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-.modal.show {
+.modal.active {
     display: flex;
 }
 
 .modal-dialog {
-    max-width: 600px;
-    width: 90%;
-}
-
-.modal-content {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease-out;
+    width: 100%;
 }
 
 .modal-header {
-    padding: 24px;
-    border-bottom: 1px solid #e2e8f0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .modal-title {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #0f172a;
 }
@@ -418,13 +355,16 @@ main {
 .btn-close {
     background: none;
     border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
+    font-size: 2rem;
     color: #64748b;
-    width: 32px;
-    height: 32px;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .btn-close:hover {
@@ -432,148 +372,169 @@ main {
     color: #0f172a;
 }
 
-.modal-body {
-    padding: 24px;
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Estilo para el logo en el header */
-.header-brand {
-    display: flex;
-    align-items: center;
+/* ==========================================================================
+   MODAL DE LOGIN - Pequeño y centrado
+   ========================================================================== */
+#loginModal .modal-dialog {
+    max-width: 420px;
 }
 
-.header-logo {
-    height: 98px; /* Ajusta el tamaño según lo necesites */
-    width: auto;
+#loginModal .modal-body {
+    padding: 32px;
 }
 
-
-.login-container h2 {
-    text-align: center;
-    margin-bottom: 24px;
+/* Botón logout dentro del modal login */
+#loginModal .btn-logout {
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
 }
-/* Reset básico */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
+#loginModal .btn-logout:hover {
+    background: #c82333;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+/* ==========================================================================
+   MODAL DE DETALLES DEL VEHÍCULO - Grande y completo
+   ========================================================================== */
+#vehicleModal .modal-dialog {
+    max-width: 1000px;           /* Mucho más ancho para foto + info */
+    max-height: 90vh;
+}
+
+#vehicleModal .modal-header {
+    padding: 28px 40px 20px;
     background: #f8fafc;
-    min-height: 100vh;
-    color: #1e293b;
 }
 
-#app {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+#vehicleModal .modal-title {
+    font-size: 2rem;
 }
 
-/* Header simplificado */
-header {
+#vehicleModal .modal-body {
+    padding: 0;                  /* Quitamos padding para controlar layout interno */
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Foto izquierda, info derecha */
+    gap: 0;
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+}
+
+/* Contenido interno del modal vehículo (ajusta según tu HTML en #modal-body) */
+#modal-body {
+    display: contents; /* Permite que el grid del body controle los hijos */
+}
+
+/* Ejemplo de estructura recomendada en tu JS al rellenar #modal-body */
+.vehicle-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.vehicle-detail-info {
+    padding: 40px;
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 16px 32px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
 }
 
-.header-logo {
-    height: 99px;
-    width: auto;
+.vehicle-detail-name {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 16px;
 }
 
-header nav a {
-    color: #64748b;
-    text-decoration: none;
-    font-weight: 500;
-    margin-left: 20px;
-    transition: color 0.3s;
-}
-
-header nav a:hover {
+.vehicle-detail-price {
+    font-size: 2.8rem;
+    font-weight: 900;
     color: #380cd8;
+    margin: 24px 0;
 }
 
-/* Panel de búsqueda */
-#search-panel {
-    background: white;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
+.vehicle-detail-features {
+    list-style: none;
+    margin: 20px 0;
 }
 
-/* Login */
-.login-section {
-    background: white;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
+.vehicle-detail-features li {
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 1.1rem;
 }
 
-.login-section h2 {
-    text-align: center;
-    margin-bottom: 20px;
+.vehicle-detail-features li strong {
     color: #0f172a;
 }
 
-/* Catálogo */
-.catalog-section {
-    background: white;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* Responsive para móvil - apila foto arriba y texto abajo */
+@media (max-width: 768px) {
+    #vehicleModal .modal-dialog {
+        max-width: 95%;
+        max-height: 95vh;
+    }
+
+    #vehicleModal .modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    #vehicleModal .modal-header {
+        padding: 20px;
+    }
+
+    .vehicle-detail-info {
+        padding: 30px;
+    }
 }
 
-/* Responsive */
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1024px) {
+    #search-panel {
+        padding: 24px;
+        gap: 20px;
+    }
+    
+    .search-field-wrapper {
+        flex: 1 1 100%;
+    }
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: 20px;
+        padding: 20px;
     }
 
     header nav {
         width: 100%;
-        display: flex;
-        justify-content: flex-end;
+        justify-content: center;
     }
-}
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .search-fields {
-        flex-direction: column;
-    }
-    
-    .search-field {
-        min-width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    main {
-        grid-template-columns: 1fr;
-    }
-    
     .catalog-list {
         grid-template-columns: 1fr;
     }
-    
-    .login-section {
-        order: 2;
-    }
-    
+
     .catalog-section {
-        order: 1;
+        padding: 24px;
     }
 }
-
