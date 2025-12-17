@@ -19,21 +19,15 @@
 
 <body>
     <div id="app">
-        <header>
-            <div class="header-brand">
-                <img src="./img/android-chrome-192x192.png" alt="RentExpress Logo" class="header-logo">
-                <h1>RentExpress</h1>
-            </div>
-            <nav>
-                <a href="#" id="btnLogin">Login</a>
-                <a href="#" id="btnLogout" style="display: none;">Logout</a>
-            </nav>
-        </header>
+        <!-- Header dinámico (renderizado por layouts) -->
+        <header></header>
 
+        <!-- Panel de búsqueda (siempre visible) -->
         <section id="search-panel"></section>
 
-        <main>
-            <!-- Ya no hay aside con login -->
+        <!-- Contenido principal -->
+        <main class="main-full-width">
+            <!-- Catálogo de vehículos -->
             <section class="catalog-section" id="catalog-section" style="display: none;">
                 <h2>Vehículos Disponibles</h2>
                 <div class="catalog-panel">
@@ -42,10 +36,18 @@
                 </div>
             </section>
 
+            <!-- Vista de inicio -->
             <section id="home-view"></section>
+
+            <!-- Vistas adicionales (ocultas por defecto) -->
+            <div id="reservations-view" style="display: none;"></div>
+            <div id="rentals-view" style="display: none;"></div>
         </main>
 
-        <!-- Modal de Detalle de Vehículo (ya lo tenías) -->
+        <!-- Footer dinámico (renderizado por layouts) -->
+        <!-- Se crea dinámicamente -->
+
+        <!-- Modal de Detalle de Vehículo -->
         <div id="vehicleModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -58,7 +60,7 @@
             </div>
         </div>
 
-        <!-- NUEVO: Modal de Login -->
+        <!-- Modal de Login -->
         <div id="loginModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -68,16 +70,10 @@
                     </div>
                     <div class="modal-body">
                         <div id="login-view"></div>
-                        <button id="logoutFromView" class="btn-logout"
-                            style="display: none; width: 100%; margin-top: 20px;">
-                            Cerrar Sesión
-                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="reservations-view" style="display: none;"></div>
-        <div id="rentals-view" style="display: none;"></div>
     </div>
 </body>
 

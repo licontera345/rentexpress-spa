@@ -10,43 +10,16 @@ export class LoginController {
 
     init() {
         this.view.render();
-        this.updateUI();
-        this.setupGlobalListeners();  
+        this.setupModalListeners();  
         this.setupFormListeners();  
     }
 
-    updateUI() {
-        const isLogged = sessionController.isLoggedIn();
-
-        const btnLogin = document.getElementById("btnLogin");
-        const btnLogout = document.getElementById("btnLogout");
-        const logoutView = document.getElementById("logoutFromView");
-
-        if (btnLogin) btnLogin.style.display = isLogged ? "none" : "inline-block";
-        if (btnLogout) btnLogout.style.display = isLogged ? "inline-block" : "none";
-        if (logoutView) logoutView.style.display = isLogged ? "block" : "none";
-
-        // Si está logueado, cerramos el modal por si estaba abierto
-        if (isLogged && this.modal) {
-            this.modal.classList.remove("active");
-        }
-    }
-
-    setupGlobalListeners() {
-        const btnLogin = document.getElementById("btnLogin");
-        if (btnLogin) {
-            btnLogin.addEventListener("click", (e) => {
-                e.preventDefault();
-                this.modal?.classList.add("active");
-                this.view.render();
-            });
-        }
-
+    setupModalListeners() {
         // Cerrar modal con la X
         const closeBtn = this.modal?.querySelector(".btn-close");
         if (closeBtn) {
             closeBtn.addEventListener("click", () => {
-                this.modal.classList.remove("active");
+                this.hide();
             });
         }
 
@@ -54,29 +27,8 @@ export class LoginController {
         if (this.modal) {
             this.modal.addEventListener("click", (e) => {
                 if (e.target === this.modal) {
-                    this.modal.classList.remove("active");
+                    this.hide();
                 }
-            });
-        }
-
-        // Botón Logout del header
-        const btnLogout = document.getElementById("btnLogout");
-        if (btnLogout) {
-            btnLogout.addEventListener("click", (e) => {
-                e.preventDefault();
-                sessionController.logOut();
-                this.updateUI();
-                if (this.router) this.router.goTo('home');
-            });
-        }
-
-        // Botón Cerrar Sesión dentro del modal
-        const logoutView = document.getElementById("logoutFromView");
-        if (logoutView) {
-            logoutView.addEventListener("click", () => {
-                sessionController.logOut();
-                this.updateUI();
-                if (this.router) this.router.goTo('home');
             });
         }
     }
@@ -106,13 +58,16 @@ export class LoginController {
                         : await LoginService.loginEmployee({ username, password });
 
                     sessionController.setLoggedInUser({ username, loginType: type }, data.token);
-                    this.updateUI();
 
                     // Cerrar modal tras login exitoso
-                    this.modal?.classList.remove("active");
+                    this.hide();
 
-                    // Opcional: ir al catálogo
-                    // if (this.router) this.router.goTo('catalog');
+                    // Recargar la ruta actual para aplicar el layout privado
+                    if (this.router) {
+                        this.router.route();
+                    }
+
+                    console.log("✅ Login exitoso");
                 } catch (error) {
                     if (out) {
                         out.textContent = "Error: " + (error.message || "Credenciales inválidas");
@@ -121,6 +76,23 @@ export class LoginController {
                 }
             }
         });
+    }
+
+    /**
+     * Maneja el logout (llamado desde LayoutManager)
+     */
+    handleLogout() {
+        sessionController.logOut();
+        
+        // Cerrar modal si estaba abierto
+        this.hide();
+
+        // Ir a home y recargar layout
+        if (this.router) {
+            this.router.goTo('home');
+        }
+
+        console.log("✅ Logout exitoso");
     }
 
     show() {

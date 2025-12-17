@@ -1,4 +1,5 @@
 import { Router } from "./Router.js";
+import { LayoutManager } from "./layouts/LayoutManager.js";
 
 // Views
 import { HomeView } from "./views/HomeView.js";
@@ -29,7 +30,7 @@ export class AppManager {
         const searchView = new SearchVehicleView();
         const detailView = new VehicleDetailView();
 
-        // 2. Crear el controlador del modal (global)
+        // 2. Crear el controlador del modal de detalle (global)
         const detailController = new VehicleDetailController(detailView, null);
 
         // 3. Crear controladores que dependen del modal
@@ -40,24 +41,33 @@ export class AppManager {
         const loginController = new LoginController(loginView, null);
         const searchController = new SearchVehicleController(searchView, catalogController, null);
 
-        // 5. Crear el router con las rutas principales
+        // 5. Crear LayoutManager (necesita loginController)
+        const layoutManager = new LayoutManager(loginController, null);
+
+        // 6. Crear el router con las rutas principales y el layoutManager
         const router = new Router({
             home: homeController,
             catalog: catalogController,
-        });
+            // Aquí puedes agregar más rutas cuando las crees:
+            // 'my-reservations': reservationsController,
+            // 'manage-vehicles': manageVehiclesController,
+            // etc.
+        }, layoutManager);
 
-        // 6. Inyectar el router en todos los controladores
+        // 7. Inyectar el router en todos los controladores y en layoutManager
         homeController.router = router;
         catalogController.router = router;
         loginController.router = router;
         searchController.router = router;
         detailController.router = router;
+        layoutManager.router = router;
 
-        // 7. Inicializar componentes globales (siempre presentes)
+        // 8. Inicializar componentes globales (siempre presentes)
         loginController.init();
         searchController.init();
         detailController.init(); // Configura cierre del modal
 
+        // 9. Iniciar el routing
         router.route();
 
         console.log("AppManager inicializado correctamente");
