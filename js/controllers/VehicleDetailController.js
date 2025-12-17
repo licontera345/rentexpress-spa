@@ -1,28 +1,44 @@
 import VehicleService from "../services/VehicleService.js";
-import VehicleDetailView from "../views/VehicleDetailView.js";
+import { VehicleDetailView } from "../views/VehicleDetailView.js";
 
-const VehicleDetailController = {
+export class VehicleDetailController {
+    constructor(view, router) {
+        this.view = view;
+        this.router = router;
+        this.init();
+    }
+
     init() {
+        this.setupModalListeners();
+    }
+
+    setupModalListeners() {
         const modal = document.getElementById("vehicleModal");
+        if (!modal) return;
 
         modal.onclick = (e) => {
             if (e.target.classList.contains("btn-close") || e.target === modal) {
                 modal.classList.remove("show");
             }
         };
-    },
+    }
 
     async showDetail(vehicleId) {
         const modal = document.getElementById("vehicleModal");
+        if (!modal) return;
+
         modal.classList.add("show");
-        
+
         try {
             const vehicle = await VehicleService.findById(vehicleId);
-            VehicleDetailView.render(vehicle);
+            this.view.render(vehicle);
         } catch (error) {
+            console.error("Error cargando vehículo:", error);
             modal.classList.remove("show");
         }
     }
-};
 
-export default VehicleDetailController;
+    show() {}
+
+    hide() {}
+}

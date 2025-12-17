@@ -1,14 +1,18 @@
-import HomeView from "../views/HomeView.js";
-
-const HomeController = {
+export class HomeController {
+    constructor(view, router) {
+        this.view = view;
+        this.router = router;
+    }
 
     init() {
-        HomeView.render();
-        this.setupEventListeners();
-    },
-    setupEventListeners() {
- 
+        this.view.render(); // Ahora sí existe y es seguro llamarlo
     }
-};
 
-export default HomeController;
+    show() {
+        this.view.show();
+    }
+
+    hide() {
+        this.view.hide();
+    }
+}

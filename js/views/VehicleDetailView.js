@@ -1,11 +1,14 @@
-const VehicleDetailView = {
-    container: "#modal-body",
+export class VehicleDetailView {
+    constructor() {
+        this.containerSelector = "#modal-body";
+        this.$container = document.querySelector(this.containerSelector);
+        this.modal = document.getElementById("vehicleModal");
+    }
 
     render(vehicle) {
-        const c = document.querySelector(this.container);
-        if (!c) return;
+        if (!this.$container) return;
 
-        c.innerHTML = `
+        this.$container.innerHTML = `
             <div class="vehicle-detail">
                 <div class="detail-section">
                     <h3>Información General</h3>
@@ -20,6 +23,12 @@ const VehicleDetailView = {
             </div>
         `;
     }
-};
 
-export default VehicleDetailView;
+    show() {
+        if (this.modal) this.modal.classList.add("show");
+    }
+
+    hide() {
+        if (this.modal) this.modal.classList.remove("show");
+    }
+}

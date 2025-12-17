@@ -22,103 +22,48 @@
         <header>
             <div class="header-brand">
                 <img src="./img/android-chrome-192x192.png" alt="RentExpress Logo" class="header-logo">
+                <h1>RentExpress</h1>
             </div>
             <nav>
-                <a href="#" id="btnLogin">Login</a>
+                <a href="#home" id="btnLogin">Login</a>
                 <a href="#" id="btnLogout" style="display: none;">Logout</a>
             </nav>
         </header>
-
-
-
-        <section id="search-panel">
-            <h2>Busca tu vehículo</h2>
-            <div class="search-fields">
-                <div class="search-field-wrapper">
-                    <label class="search-field-label" for="pickup-location">Lugar de recogida</label>
-                    <select id="pickup-location" class="search-field">
-                        <option value="">Seleccionar</option>
-                    </select>
-                    <div id="pickup-hq-details"></div>
-                </div>
-                <div class="search-field-wrapper">
-                    <label class="search-field-label" for="return-location">Lugar de devolución</label>
-                    <select id="return-location" class="search-field">
-                        <option value="">Seleccionar</option>
-                    </select>
-                    <div id="return-hq-details"></div>
-                </div>
-                <div class="search-field-wrapper small">
-                    <label class="search-field-label" for="pickup-date">Fecha de recogida</label>
-                    <input type="date" id="pickup-date" class="search-field">
-                </div>
-                <div class="search-field-wrapper small">
-                    <label class="search-field-label" for="pickup-time">Hora</label>
-                    <input type="time" id="pickup-time" class="search-field">
-                </div>
-                <div class="search-field-wrapper small">
-                    <label class="search-field-label" for="return-date">Fecha de devolución</label>
-                    <input type="date" id="return-date" class="search-field">
-                </div>
-                <div class="search-field-wrapper small">
-                    <label class="search-field-label" for="return-time">Hora</label>
-                    <input type="time" id="return-time" class="search-field">
-                </div>
-                <div class="search-field-wrapper button">
-                    <button id="search-vehicles-btn">BUSCAR</button>
-                </div>
-            </div>
+        <section id="search-panel">    
         </section>
 
         <main>
             <aside class="login-section">
                 <div class="login-container">
-                    <h2>Iniciar Sesión</h2>
                     <div id="login-view">
-                        <form id="login-form">
-                            <div class="form-group">
-                                <label for="username">Usuario</label>
-                                <input type="text" id="username" name="username" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Contraseña</label>
-                                <input type="password" id="password" name="password" required>
-                            </div>
-                            <button type="submit" class="btn-primary">Iniciar Sesión</button>
-                        </form>
                     </div>
-                    <button id="logoutFromView" class="btn-logout" style="display: none;">Cerrar Sesión</button>
+                    <button id="logoutFromView" class="btn-logout" style="display: none;">
+                        Cerrar Sesión
+                    </button>
                 </div>
-
-
             </aside>
-
             <section class="catalog-section" id="catalog-section" style="display: none;">
                 <h2>Vehículos Disponibles</h2>
                 <div class="catalog-panel">
-                    <p id="catalog-status" class="catalog-status" aria-live="polite"></p>
                     <p id="vehicle-count" class="catalog-count"></p>
                     <ul id="vehicle-list" class="catalog-list"></ul>
                 </div>
             </section>
+            <section id="home-view">
+            </section>
         </main>
-
-        <!-- Modal para detalles del vehículo -->
         <div id="vehicleModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <div class="modal-header-content">
-                            <h5 class="modal-title">Detalles del Vehículo</h5>
-                        </div>
+                        <h5 class="modal-title">Detalles del Vehículo</h5>
                         <button type="button" class="btn-close" aria-label="Cerrar">×</button>
                     </div>
-                    <div class="modal-body" id="modal-body"></div>
+                    <div class="modal-body" id="modal-body">
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div id="home-view" style="display: none;"></div>
         <div id="reservations-view" style="display: none;"></div>
         <div id="rentals-view" style="display: none;"></div>
     </div>

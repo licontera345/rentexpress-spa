@@ -1,28 +1,42 @@
-import CatalogVehicleView from "../views/CatalogVehicleView.js";
-import VehicleDetailController from "./VehicleDetailController.js";
+import { CatalogVehicleView } from "../views/CatalogVehicleView.js";
 
-const CatalogVehicleController = {
+export class CatalogVehicleController {
+    constructor(view, detailController, router) {
+        this.view = view;
+        this.detailController = detailController;
+        this.router = router;
+    }
+
     init() {
-        CatalogVehicleView.hide();
-    },
-
-    setSearchParams(params) {
-        this.searchParams = params;
-    },
+        this.view.hide();
+    }
 
     displaySearchResults(vehicles) {
-        CatalogVehicleView.render(vehicles);
-        if (vehicles?.length > 0) {
-            document.querySelector("#catalog-section").scrollIntoView({ behavior: "smooth" });
+        this.view.render(vehicles);
+
+        if (vehicles && vehicles.length > 0) {
+            const catalogSection = document.querySelector("#catalog-section");
+            if (catalogSection) {
+                catalogSection.scrollIntoView({ behavior: "smooth" });
+            }
             this.setupEventListeners();
         }
-    },
+    }
 
     setupEventListeners() {
         document.querySelectorAll(".catalog-item").forEach(item => {
-            item.onclick = () => VehicleDetailController.showDetail(item.dataset.vehicleId);
+            item.onclick = () => {
+                const vehicleId = item.dataset.vehicleId;
+                this.detailController.showDetail(vehicleId);
+            };
         });
     }
-};
 
-export default CatalogVehicleController;
+    show() {
+        this.view.show();
+    }
+
+    hide() {
+        this.view.hide();
+    }
+}

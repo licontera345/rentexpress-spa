@@ -1,40 +1,69 @@
-import SearchVehicleView from "../views/SearchVehicleView.js";
+import { SearchVehicleView } from "../views/SearchVehicleView.js";
 import HeadquartersService from "../services/SedeService.js";
 import VehicleCategoryService from "../services/VehicleCategoryService.js";
 import VehicleService from "../services/VehicleService.js";
-import CatalogVehicleController from "./CatalogVehicleController.js";
 
-const SearchVehicleController = {
+export class SearchVehicleController {
+    constructor(view, catalogController, router) {
+        this.view = view;
+        this.catalogController = catalogController;
+        this.router = router;
+    }
+
     async init() {
-        const [hqs, cats] = await Promise.all([
-            HeadquartersService.getAll(),
-            VehicleCategoryService.getAll("es")
-        ]);
-        
-        SearchVehicleView.render(hqs, cats);
+        try {
+            const [hqs, cats] = await Promise.all([
+                HeadquartersService.getAll(),
+                VehicleCategoryService.getAll("es")
+            ]);
 
-        document.getElementById("pickup-headquarters").onchange = (e) => 
-            SearchVehicleView.showHeadquarterDetails(e.target, "pickup-hq-details");
-        
-        document.getElementById("return-headquarters").onchange = (e) => 
-            SearchVehicleView.showHeadquarterDetails(e.target, "return-hq-details");
+            this.view.render(hqs, cats);
+            this.setupListeners();
+        } catch (error) {
+            console.error("Error cargando datos iniciales:", error);
+        }
+    }
 
-        document.getElementById("search-vehicles-btn").onclick = () => this.handleSearch();
-    },
+    setupListeners() {
+        const pickupSelect = document.getElementById("pickup-headquarters");
+        const returnSelect = document.getElementById("return-headquarters");
+        const searchBtn = document.getElementById("search-vehicles-btn");
+
+        if (pickupSelect) {
+            pickupSelect.onchange = (e) =>
+                this.view.showHeadquarterDetails(e.target, "pickup-hq-details");
+        }
+        if (returnSelect) {
+            returnSelect.onchange = (e) =>
+                this.view.showHeadquarterDetails(e.target, "return-hq-details");
+        }
+        if (searchBtn) {
+            searchBtn.onclick = () => this.handleSearch();
+        }
+    }
 
     async handleSearch() {
-        const params = SearchVehicleView.getSearchParams();
+        const params = this.view.getSearchParams();
 
-        const results = await VehicleService.search({
-            currentHeadquartersId: params.pickupHeadquartersId,
-            activeStatus: true,
-            pageNumber: 1,
-            pageSize: 25
-        });
+        try {
+            const results = await VehicleService.search({
+                currentHeadquartersId: params.pickupHeadquartersId,
+                activeStatus: true,
+                pageNumber: 1,
+                pageSize: 25
+            });
 
-        CatalogVehicleController.setSearchParams(params);
-        CatalogVehicleController.displaySearchResults(results.results || []);
+            // Usamos la instancia inyectada
+            this.catalogController.displaySearchResults(results.results || []);
+            
+            // Opcional: navegar al catálogo
+            // this.router?.goTo('catalog');
+        } catch (error) {
+            console.error("Error en búsqueda:", error);
+            this.catalogController.displaySearchResults([]);
+        }
     }
-};
 
-export default SearchVehicleController;
+    show() { this.view.show(); }
+    hide() { this.view.hide(); }
+}

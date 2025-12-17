@@ -1,17 +1,19 @@
-const HomeView = {
-
-    container: "#home-view",
+export class HomeView {
+    constructor() {
+        this.containerSelector = "#home-view";
+        this.$container = document.querySelector(this.containerSelector);
+    }
 
     render() {
-        const c = document.querySelector(this.container);
-        if (!c) {
-            return;
-        }
-
-        const html = ` `;
-
-        c.innerHTML = html;
+        if (!this.$container) return;
+        this.$container.innerHTML = ``;
     }
-};
 
-export default HomeView;
+    show() {
+        if (this.$container) this.$container.style.display = "block";
+    }
+
+    hide() {
+        if (this.$container) this.$container.style.display = "none";
+    }
+}
