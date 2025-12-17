@@ -36,6 +36,39 @@ const Config = {
         BY_ID: (id) => `/headquarters/open/${id}`
     },
 
+    // Endpoints de Reservas
+    RESERVATIONS: {
+        BY_ID: (id) => `/reservations/${id}`,
+        CREATE: "/reservations",
+        UPDATE: (id) => `/reservations/${id}`,
+        DELETE: (id) => `/reservations/${id}`,
+        SEARCH: "/reservations/search"
+    },
+
+    // Endpoints de Alquileres (Rentals)
+    RENTALS: {
+        BY_ID: (id) => `/rentals/${id}`,
+        CREATE: "/rentals",
+        UPDATE: (id) => `/rentals/${id}`,
+        DELETE: (id) => `/rentals/${id}`,
+        SEARCH: "/rentals/search",
+        EXISTS_BY_RESERVATION: (reservationId) => `/rentals/reservations/${reservationId}/exists`,
+        FROM_RESERVATION: "/rentals/from-reservation",
+        AUTO_CONVERT: "/rentals/auto-convert"
+    },
+
+    // Endpoints de Estados de Reserva
+    RESERVATION_STATUSES: {
+        ALL: (isoCode) => `/reservation-statuses?isoCode=${isoCode}`,
+        BY_ID: (id, isoCode) => `/reservation-statuses/${id}?isoCode=${isoCode}`
+    },
+
+    // Endpoints de Estados de Alquiler
+    RENTAL_STATUSES: {
+        ALL: (isoCode) => `/rental-statuses?isoCode=${isoCode}`,
+        BY_ID: (id, isoCode) => `/rental-statuses/${id}?isoCode=${isoCode}`
+    },
+
     // Endpoints de Provincias
     PROVINCES: {
         ALL: "/provinces",
