@@ -1,111 +1,77 @@
-/**
- * Router mejorado con soporte para layouts
- */
-export class Router {
-    constructor(routes, layoutManager) {
-        this.routes = routes;
-        this.layoutManager = layoutManager;
-        this.currentController = null;
-        
-        // Solo rutas públicas que EXISTEN
-        this.publicRoutes = ['home', 'catalog'];
-        
-        // Rutas privadas (para cuando las implementes)
-        this.employeeRoutes = [];
-        this.userRoutes = [];
+import { Router } from "./Router.js";
+import { LayoutManager } from "./layouts/LayoutManager.js";
 
-        window.addEventListener('hashchange', () => this.route());
-        this.route();
+// Views
+import { HomeView } from "./views/HomeView.js";
+import { LoginView } from "./views/LoginView.js";
+import { CatalogVehicleView } from "./views/CatalogVehicleView.js";
+import { SearchVehicleView } from "./views/SearchVehicleView.js";
+import { VehicleDetailView } from "./views/VehicleDetailView.js";
+import { ManageVehiclesView } from "./views/ManageVehiclesView.js";
+
+// Controllers
+import { HomeController } from "./controllers/HomeController.js";
+import { LoginController } from "./controllers/LoginController.js";
+import { CatalogVehicleController } from "./controllers/CatalogVehicleController.js";
+import { SearchVehicleController } from "./controllers/SearchVehicleController.js";
+import { VehicleDetailController } from "./controllers/VehicleDetailController.js";
+import { ManageVehiclesController } from "./controllers/ManageVehiclesController.js";
+
+export class AppManager {
+    constructor() {
+        this.init();
     }
 
-    goTo(path) {
-        window.location.hash = path;
-    }
+    init() {
+        console.log("🚀 Inicializando AppManager...");
 
-    route() {
-        const path = window.location.hash.slice(1) || 'home';
-        const controller = this.routes[path];
+        // 1. Crear todas las vistas
+        const homeView = new HomeView();
+        const loginView = new LoginView();
+        const catalogView = new CatalogVehicleView();
+        const searchView = new SearchVehicleView();
+        const detailView = new VehicleDetailView();
+        const manageVehiclesView = new ManageVehiclesView();
 
-        console.log(` Routing to: ${path}`);
+        // 2. Crear el controlador del modal de detalle (global)
+        const detailController = new VehicleDetailController(detailView, null);
 
-        if (!controller) {
-            console.error(` Ruta no encontrada: ${path}`);
-            this.goTo('home');
-            return;
-        }
+        // 3. Crear controladores que dependen del modal
+        const catalogController = new CatalogVehicleController(catalogView, detailController, null);
 
-        const isAuthenticated = this.isAuthenticated();
-        const isPublic = this.isPublicRoute(path);
+        // 4. Crear los demás controladores
+        const homeController = new HomeController(homeView, null);
+        const loginController = new LoginController(loginView, null);
+        const searchController = new SearchVehicleController(searchView, catalogController, null);
+        const manageVehiclesController = new ManageVehiclesController(manageVehiclesView, null);
 
-        // Actualizar layout según autenticación
-        if (this.layoutManager) {
-            this.layoutManager.updateLayout(isAuthenticated);
-        }
+        // 5. Crear LayoutManager (necesita loginController)
+        const layoutManager = new LayoutManager(loginController, null);
 
-        // Verificar autenticación para rutas privadas
-        if (!isPublic && !isAuthenticated) {
-            console.warn(` Acceso denegado a ruta privada: ${path}`);
-            alert('Debes iniciar sesión para acceder a esta sección');
-            this.goTo('home');
-            return;
-        }
+        // 6. Crear el router SOLO con las rutas que existen
+        const router = new Router({
+            home: homeController,
+            catalog: catalogController,
+            'manage-vehicles': manageVehiclesController
+        }, layoutManager);
 
-        // Verificar permisos según rol
-        if (!isPublic && isAuthenticated && !this.hasPermission(path)) {
-            console.warn(` Sin permisos para: ${path}`);
-            alert('No tienes permisos para acceder a esta sección');
-            this.goTo('home');
-            return;
-        }
+        // 7. Inyectar el router en todos los controladores y en layoutManager
+        homeController.router = router;
+        catalogController.router = router;
+        loginController.router = router;
+        searchController.router = router;
+        detailController.router = router;
+        manageVehiclesController.router = router;
+        layoutManager.router = router;
 
-        // Ocultar controlador anterior
-        if (this.currentController && this.currentController !== controller) {
-            this.currentController.hide();
-        }
+        // 8. Inicializar componentes globales (siempre presentes)
+        loginController.init();
+        searchController.init();
+        detailController.init();
 
-        // Activar nuevo controlador
-        this.currentController = controller;
-        this.currentController.init();
-        this.currentController.show();
+        // 9. Iniciar el routing
+        router.route();
 
-        console.log(`✅ Ruta cargada: ${path}`);
-    }
-
-    isPublicRoute(path) {
-        return this.publicRoutes.includes(path);
-    }
-
-    isAuthenticated() {
-        const token = localStorage.getItem('token');
-        const user = localStorage.getItem('loggedInUser');
-        return token !== null && user !== null;
-    }
-
-    getUserType() {
-        const user = localStorage.getItem('loggedInUser');
-        if (!user) return null;
-
-        try {
-            const userData = JSON.parse(user);
-            return userData.loginType;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    hasPermission(path) {
-        const userType = this.getUserType();
-
-        // Rutas solo para empleados
-        if (this.employeeRoutes.includes(path) && userType !== 'employee') {
-            return false;
-        }
-
-        // Rutas solo para usuarios
-        if (this.userRoutes.includes(path) && userType !== 'user') {
-            return false;
-        }
-
-        return true;
+        console.log("✅ AppManager inicializado correctamente");
     }
 }

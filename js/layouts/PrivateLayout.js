@@ -75,18 +75,14 @@ export class PrivateLayout {
         return [
             { hash: "#home", route: "home", icon: "🏠", text: "Inicio" },
             { hash: "#catalog", route: "catalog", icon: "🚗", text: "Catálogo" },
-            { hash: "#manage-vehicles", route: "manage-vehicles", icon: "⚙️", text: "Gestionar Vehículos" },
-            { hash: "#manage-rentals", route: "manage-rentals", icon: "📋", text: "Gestionar Alquileres" },
-            { hash: "#reports", route: "reports", icon: "📊", text: "Reportes" }
+            { hash: "#manage-vehicles", route: "manage-vehicles", icon: "⚙️", text: "Gestionar Vehículos" }
         ];
     }
 
     getUserMenu() {
         return [
             { hash: "#home", route: "home", icon: "🏠", text: "Inicio" },
-            { hash: "#catalog", route: "catalog", icon: "🚗", text: "Buscar Vehículos" },
-            { hash: "#my-reservations", route: "my-reservations", icon: "📅", text: "Mis Reservas" },
-            { hash: "#my-profile", route: "my-profile", icon: "👤", text: "Mi Perfil" }
+            { hash: "#catalog", route: "catalog", icon: "🚗", text: "Buscar Vehículos" }
         ];
     }
 

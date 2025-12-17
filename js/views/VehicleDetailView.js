@@ -5,29 +5,30 @@ export class VehicleDetailView {
         this.modal = document.getElementById("vehicleModal");
     }
 
-  render(vehicle) {
-    if (!this.$container) return;
+    render(vehicle) {
+        if (!this.$container) return;
 
-    this.$container.innerHTML = `
-        <div class="vehicle-detail-image">
-            <img src="./img/default.jpg" alt="${vehicle.brand} ${vehicle.model}">
-        </div>
+        this.$container.innerHTML = `
+            <div class="vehicle-detail-image-placeholder">
+                <span class="vehicle-detail-initials">${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}</span>
+                <p class="no-image-detail-text">Sin imagen</p>
+            </div>
 
-        <div class="vehicle-detail-info">
-            <h2 class="vehicle-detail-name">
-                ${vehicle.brand} ${vehicle.model}
-            </h2>
+            <div class="vehicle-detail-info">
+                <h2 class="vehicle-detail-name">
+                    ${vehicle.brand} ${vehicle.model}
+                </h2>
 
-            <ul class="vehicle-detail-features">
-                <li><strong>Año de fabricación:</strong> ${vehicle.manufactureYear}</li>
-                <li><strong>Matrícula:</strong> ${vehicle.licensePlate}</li>
-                <li><strong>VIN:</strong> ${vehicle.vinNumber}</li>
-                <li><strong>Kilometraje:</strong> ${vehicle.currentMileage.toLocaleString()} km</li>
-                <li><strong>Precio:</strong> ${vehicle.dailyPrice} € / día</li>
-            </ul>
-        </div>
-    `;
-}
+                <ul class="vehicle-detail-features">
+                    <li><strong>Año de fabricación:</strong> ${vehicle.manufactureYear}</li>
+                    <li><strong>Matrícula:</strong> ${vehicle.licensePlate}</li>
+                    <li><strong>VIN:</strong> ${vehicle.vinNumber}</li>
+                    <li><strong>Kilometraje:</strong> ${vehicle.currentMileage.toLocaleString()} km</li>
+                    <li><strong>Precio:</strong> ${vehicle.dailyPrice} € / día</li>
+                </ul>
+            </div>
+        `;
+    }
 
     show() {
         if (this.modal) this.modal.classList.add("active");

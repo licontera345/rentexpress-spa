@@ -12,7 +12,9 @@ export class CatalogVehicleView {
         this.$container.style.display = "block";
 
         if (!vehicles || vehicles.length === 0) {
-            if (this.listContainer) this.listContainer.innerHTML = "<li>No hay vehículos disponibles</li>";
+            if (this.listContainer) this.listContainer.innerHTML = `
+                <li class="catalog-empty">No hay vehículos disponibles</li>
+            `;
             if (this.countElement) this.countElement.textContent = "0 vehículos";
             return;
         }
@@ -20,11 +22,24 @@ export class CatalogVehicleView {
         if (this.listContainer) {
             this.listContainer.innerHTML = vehicles.map(v => `
                 <li class="catalog-item" data-vehicle-id="${v.vehicleId}">
-                 <img src="./img/default.jpg" alt="${v.brand} ${v.model}">
-                    <h3>${v.brand} ${v.model} (${v.manufactureYear})</h3>
-                    <p>Matrícula: ${v.licensePlate}</p>
-                    <p>KM: ${v.currentMileage}</p>
-                    <p>Precio: ${v.dailyPrice}€</p>
+                    <div class="vehicle-image-placeholder">
+                        <span class="vehicle-initials">${v.brand.charAt(0)}${v.model.charAt(0)}</span>
+                        <p class="no-image-text">Sin imagen</p>
+                    </div>
+                    <div class="vehicle-card">
+                        <div class="vehicle-header">
+                            <span class="vehicle-name">${v.brand} ${v.model}</span>
+                            <span class="vehicle-year">${v.manufactureYear}</span>
+                        </div>
+                        <div class="vehicle-info">
+                            <p><strong>Matrícula:</strong> ${v.licensePlate}</p>
+                            <p><strong>Kilometraje:</strong> ${v.currentMileage.toLocaleString()} km</p>
+                        </div>
+                        <div class="vehicle-price">
+                            <span class="price-label">Precio por día</span>
+                            <span class="price-value">${v.dailyPrice}€</span>
+                        </div>
+                    </div>
                 </li>
             `).join("");
         }
