@@ -88,7 +88,7 @@ export class SearchVehicleView {
         if (!addressId) {
             html += "<em>Dirección no disponible</em>";
         } else {
-            // Intentamos cargar la dirección solo si hay token (usuario logueado)
+            // Intentamos cargar la dirección solo si hay token
             const token = sessionController.getToken ? sessionController.getToken() : sessionController.token;
             if (token) {
                 try {

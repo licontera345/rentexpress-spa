@@ -19,15 +19,11 @@
 
 <body>
     <div id="app">
-        <!-- Header dinámico (renderizado por layouts) -->
-        <header></header>
+        <header> </header>
+  
+     <section id="search-panel"></section>
 
-        <!-- Panel de búsqueda (siempre visible) -->
-        <section id="search-panel"></section>
-
-        <!-- Contenido principal -->
         <main class="main-full-width">
-            <!-- Catálogo de vehículos -->
             <section class="catalog-section" id="catalog-section" style="display: none;">
                 <h2>Vehículos Disponibles</h2>
                 <div class="catalog-panel">
@@ -35,19 +31,10 @@
                     <ul id="vehicle-list" class="catalog-list"></ul>
                 </div>
             </section>
-
-            <!-- Vista de inicio -->
             <section id="home-view"></section>
-
-            <!-- Vistas adicionales (ocultas por defecto) -->
             <div id="reservations-view" style="display: none;"></div>
             <div id="rentals-view" style="display: none;"></div>
         </main>
-
-        <!-- Footer dinámico (renderizado por layouts) -->
-        <!-- Se crea dinámicamente -->
-
-        <!-- Modal de Detalle de Vehículo -->
         <div id="vehicleModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -59,8 +46,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Modal de Login -->
         <div id="loginModal" class="modal">
             <div class="modal-dialog">
                 <div class="modal-content">

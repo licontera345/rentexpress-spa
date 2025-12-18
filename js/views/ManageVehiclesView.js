@@ -1,5 +1,3 @@
-import ImageService from "../services/ImageService.js";
-
 export class ManageVehiclesView {
     constructor() {
         this.containerSelector = "#manage-vehicles-view";
@@ -11,14 +9,10 @@ export class ManageVehiclesView {
             this.$container.style.display = "none";
             document.querySelector("main").appendChild(this.$container);
         }
-        this.vehicleImages = new Map();
     }
 
-    async render(vehicles = []) {
+    render(vehicles = []) {
         if (!this.$container) return;
-
-        // Cargar thumbnails usando caché optimizado
-        await this.loadVehicleImages(vehicles);
 
         this.$container.innerHTML = `
             <div class="manage-vehicles-container">
@@ -33,7 +27,7 @@ export class ManageVehiclesView {
                     <table class="vehicles-table">
                         <thead>
                             <tr>
-                                <th>Imagen</th>
+                                <th>Iniciales</th>
                                 <th>Marca</th>
                                 <th>Modelo</th>
                                 <th>Año</th>
@@ -50,23 +44,6 @@ export class ManageVehiclesView {
                 </div>
             </div>
         `;
-    }
-
-    async loadVehicleImages(vehicles) {
-        this.vehicleImages.clear();
-
-        await Promise.all(
-            vehicles.map(async (v) => {
-                try {
-                    const thumb = await ImageService.getVehicleThumbnail(v.vehicleId);
-                    if (thumb) {
-                        this.vehicleImages.set(v.vehicleId, thumb);
-                    }
-                } catch (error) {
-                    console.warn(`No thumbnail for vehicle ${v.vehicleId}`);
-                }
-            })
-        );
     }
 
     renderVehiclesRows(vehicles) {
@@ -96,9 +73,6 @@ export class ManageVehiclesView {
                     </span>
                 </td>
                 <td class="actions-cell">
-                    <button class="btn-icon btn-images" data-vehicle-id="${v.vehicleId}" title="Gestionar imágenes">
-                        🖼️
-                    </button>
                     <button class="btn-icon btn-edit" data-vehicle-id="${v.vehicleId}" title="Editar">
                         ✏️
                     </button>
@@ -111,34 +85,120 @@ export class ManageVehiclesView {
     }
 
     renderVehicleThumb(vehicle) {
-        const imageName = this.vehicleImages.get(vehicle.vehicleId);
-        
-        if (imageName) {
-            const imageUrl = ImageService.getVehicleImageUrl(vehicle.vehicleId, imageName);
-            return `
-                <img src="${imageUrl}" 
-                     alt="${vehicle.brand} ${vehicle.model}"
-                     class="vehicle-thumb"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="vehicle-thumb-placeholder" style="display: none;">
-                    ${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}
-                </div>
-            `;
-        } else {
-            return `
-                <div class="vehicle-thumb-placeholder">
-                    ${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}
-                </div>
-            `;
-        }
+        return `
+            <div class="vehicle-thumb-placeholder">
+                ${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}
+            </div>
+        `;
     }
 
-    // ... el resto del archivo (renderVehicleForm, renderImageGallery, etc.) se mantiene exactamente igual ...
-    renderVehicleForm(vehicle = null) { /* sin cambios */ }
-    renderImageGallery(vehicleId, vehicle, images = []) { /* sin cambios */ }
-    renderImagesGrid(vehicleId, images) { /* sin cambios */ }
-    getFormData() { /* sin cambios */ }
-    showMessage(message, type = 'success') { /* sin cambios */ }
-    show() { if (this.$container) this.$container.style.display = "block"; }
-    hide() { if (this.$container) this.$container.style.display = "none"; }
+    renderVehicleForm(vehicle = null) {
+        return `
+            <form id="vehicle-form" class="modal-form">
+                <input type="hidden" name="vehicleId" value="${vehicle?.vehicleId || ''}">
+                
+                <h3>${vehicle ? 'Editar' : 'Nuevo'} Vehículo</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marca *</label>
+                        <input type="text" name="brand" value="${vehicle?.brand || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo *</label>
+                        <input type="text" name="model" value="${vehicle?.model || ''}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Año de fabricación *</label>
+                        <input type="number" name="manufactureYear" value="${vehicle?.manufactureYear || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Matrícula *</label>
+                        <input type="text" name="licensePlate" value="${vehicle?.licensePlate || ''}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>VIN *</label>
+                        <input type="text" name="vinNumber" value="${vehicle?.vinNumber || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kilometraje actual *</label>
+                        <input type="number" name="currentMileage" value="${vehicle?.currentMileage || ''}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio por día (€) *</label>
+                        <input type="number" step="0.01" name="dailyPrice" value="${vehicle?.dailyPrice || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="activeStatus">
+                            <option value="true" ${vehicle?.activeStatus !== false ? 'selected' : ''}>Activo</option>
+                            <option value="false" ${vehicle?.activeStatus === false ? 'selected' : ''}>Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="btn-cancel-form" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        `;
+    }
+
+    getFormData() {
+        const form = document.getElementById('vehicle-form');
+        if (!form) return null;
+
+        const formData = new FormData(form);
+        const data = {};
+
+        for (let [key, value] of formData.entries()) {
+            if (key === 'vehicleId' && !value) {
+                continue;
+            }
+            if (key === 'activeStatus') {
+                data[key] = value === 'true';
+            } else if (key === 'manufactureYear' || key === 'currentMileage') {
+                data[key] = parseInt(value);
+            } else if (key === 'dailyPrice') {
+                data[key] = parseFloat(value);
+            } else {
+                data[key] = value;
+            }
+        }
+
+        return data;
+    }
+
+    showMessage(message, type = 'success') {
+        const container = this.$container.querySelector('.manage-vehicles-container');
+        if (!container) return;
+
+        const messageEl = document.createElement('div');
+        messageEl.className = `message message-${type}`;
+        messageEl.textContent = message;
+        
+        container.insertBefore(messageEl, container.firstChild);
+
+        setTimeout(() => {
+            messageEl.remove();
+        }, 3000);
+    }
+
+    show() {
+        if (this.$container) this.$container.style.display = "block";
+    }
+
+    hide() {
+        if (this.$container) this.$container.style.display = "none";
+    }
 }

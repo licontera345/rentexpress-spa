@@ -1,5 +1,3 @@
-import ImageService from "../services/ImageService.js";
-
 export class CatalogVehicleView {
     constructor() {
         this.containerSelector = "#catalog-section";
@@ -8,7 +6,7 @@ export class CatalogVehicleView {
         this.countElement = document.querySelector("#vehicle-count");
     }
 
-    async render(vehicles) {
+    render(vehicles) {
         if (!this.$container) return;
 
         this.$container.style.display = "block";
@@ -21,23 +19,10 @@ export class CatalogVehicleView {
             return;
         }
 
-        // Uso optimizado con caché
-        const vehiclesWithImages = await Promise.all(
-            vehicles.map(async (v) => {
-                try {
-                    const images = await ImageService.listVehicleImages(v.vehicleId);
-                    return { ...v, images: images || [] };
-                } catch (error) {
-                    console.warn(`No se pudieron cargar imágenes para vehículo ${v.vehicleId}`);
-                    return { ...v, images: [] };
-                }
-            })
-        );
-
         if (this.listContainer) {
-            this.listContainer.innerHTML = vehiclesWithImages.map(v => `
+            this.listContainer.innerHTML = vehicles.map(v => `
                 <li class="catalog-item" data-vehicle-id="${v.vehicleId}">
-                    ${this.renderVehicleImage(v)}
+                    ${this.renderVehiclePlaceholder(v)}
                     <div class="vehicle-card">
                         <div class="vehicle-header">
                             <span class="vehicle-name">${v.brand} ${v.model}</span>
@@ -59,27 +44,13 @@ export class CatalogVehicleView {
         if (this.countElement) this.countElement.textContent = `${vehicles.length} vehículos`;
     }
 
-    renderVehicleImage(vehicle) {
-        if (vehicle.images && vehicle.images.length > 0) {
-            const imageUrl = ImageService.getVehicleImageUrl(vehicle.vehicleId, vehicle.images[0]);
-            return `
-                <img src="${imageUrl}" 
-                     alt="${vehicle.brand} ${vehicle.model}"
-                     class="vehicle-card-image"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="vehicle-image-placeholder" style="display: none;">
-                    <span class="vehicle-initials">${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}</span>
-                    <p class="no-image-text">Sin imagen</p>
-                </div>
-            `;
-        } else {
-            return `
-                <div class="vehicle-image-placeholder">
-                    <span class="vehicle-initials">${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}</span>
-                    <p class="no-image-text">Sin imagen</p>
-                </div>
-            `;
-        }
+    renderVehiclePlaceholder(vehicle) {
+        return `
+            <div class="vehicle-image-placeholder">
+                <span class="vehicle-initials">${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}</span>
+                <p class="no-image-text">Sin imagen</p>
+            </div>
+        `;
     }
 
     show() {

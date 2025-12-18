@@ -31,8 +31,7 @@ export class VehicleDetailController {
 
         try {
             const vehicle = await VehicleService.findById(vehicleId);
-            // Ahora render es async para cargar las imágenes
-            await this.view.render(vehicle);
+            this.view.render(vehicle);
         } catch (error) {
             console.error("Error cargando vehículo:", error);
             modal.classList.remove("active");

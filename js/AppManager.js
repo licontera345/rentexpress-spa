@@ -23,9 +23,9 @@ export class AppManager {
     }
 
     init() {
-        console.log("🚀 Inicializando AppManager...");
+        console.log("Inicializando AppManager...");
 
-        // 1. Crear todas las vistas
+        //Crear todas las vistas
         const homeView = new HomeView();
         const loginView = new LoginView();
         const catalogView = new CatalogVehicleView();
@@ -33,29 +33,29 @@ export class AppManager {
         const detailView = new VehicleDetailView();
         const manageVehiclesView = new ManageVehiclesView();
 
-        // 2. Crear el controlador del modal de detalle (global)
+        //Crear el controlador del modal de detalle
         const detailController = new VehicleDetailController(detailView, null);
 
-        // 3. Crear controladores que dependen del modal
+        //Crear controladores que dependen del modal
         const catalogController = new CatalogVehicleController(catalogView, detailController, null);
 
-        // 4. Crear los demás controladores
+        //Crear los demás controladores
         const homeController = new HomeController(homeView, null);
         const loginController = new LoginController(loginView, null);
         const searchController = new SearchVehicleController(searchView, catalogController, null);
         const manageVehiclesController = new ManageVehiclesController(manageVehiclesView, null);
 
-        // 5. Crear LayoutManager (necesita loginController)
+        //Crear LayoutManager
         const layoutManager = new LayoutManager(loginController, null);
 
-        // 6. Crear el router SOLO con las rutas que existen
+        //Crear el router SOLO con las rutas que existen
         const router = new Router({
             home: homeController,
             catalog: catalogController,
             'manage-vehicles': manageVehiclesController
         }, layoutManager);
 
-        // 7. Inyectar el router en todos los controladores y en layoutManager
+        //Inyectar el router en todos los controladores y en layoutManager
         homeController.router = router;
         catalogController.router = router;
         loginController.router = router;
@@ -64,14 +64,14 @@ export class AppManager {
         manageVehiclesController.router = router;
         layoutManager.router = router;
 
-        // 8. Inicializar componentes globales (siempre presentes)
+        //Inicializar componentes globales
         loginController.init();
         searchController.init();
         detailController.init();
 
-        // 9. Iniciar el routing
+        //Iniciar el routing
         router.route();
 
-        console.log("✅ AppManager inicializado correctamente");
+        console.log("AppManager inicializado correctamente");
     }
 }

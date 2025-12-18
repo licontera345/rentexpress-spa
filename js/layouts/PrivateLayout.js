@@ -1,9 +1,5 @@
 import sessionController from "../controllers/SessionController.js";
 
-/**
- * Layout para páginas privadas (requieren autenticación)
- * Incluye: Header con logo + usuario + botón Logout, Footer, Menú lateral según rol
- */
 export class PrivateLayout {
     constructor() {
         this.headerSelector = "header";
@@ -121,7 +117,6 @@ export class PrivateLayout {
             });
         }
 
-        // Resaltar ruta activa en el sidebar
         if (router) {
             const currentHash = window.location.hash.slice(1) || 'home';
             document.querySelectorAll(".sidebar-link").forEach(link => {

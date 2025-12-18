@@ -1,7 +1,3 @@
-/**
- * Layout para páginas públicas
- * Incluye: Header con logo + botón Login, Footer
- */
 export class PublicLayout {
     constructor() {
         this.headerSelector = "header";
