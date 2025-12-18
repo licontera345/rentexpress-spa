@@ -242,6 +242,7 @@ export class ManageVehiclesController {
 
             try {
                 await ImageService.uploadVehicleImage(vehicleId, this.selectedFile);
+                ImageService.invalidateCache();  // ← Invalida caché tras subir
                 this.view.showMessage("Imagen subida correctamente", "success");
                 
                 // Recargar galería
@@ -264,6 +265,7 @@ export class ManageVehiclesController {
 
                 try {
                     await ImageService.deleteVehicleImage(vehicleId, imageName);
+                    ImageService.invalidateCache();  // ← Invalida caché tras eliminar
                     this.view.showMessage("Imagen eliminada correctamente", "success");
                     
                     // Recargar galería

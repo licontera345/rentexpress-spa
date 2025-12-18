@@ -21,7 +21,7 @@ export class CatalogVehicleView {
             return;
         }
 
-        // Cargar imágenes para cada vehículo
+        // Uso optimizado con caché
         const vehiclesWithImages = await Promise.all(
             vehicles.map(async (v) => {
                 try {

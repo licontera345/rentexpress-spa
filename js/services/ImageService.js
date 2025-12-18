@@ -5,42 +5,76 @@ import Config from "../config/Config.js";
  */
 const ImageService = {
 
+    // ==================== CACHÉ GLOBAL ====================
+    _imageCache: new Map(),        // vehicleId → array completo de nombres de imágenes
+    _thumbCache: new Map(),        // vehicleId → primera imagen (thumbnail)
+    _cacheTimestamp: 0,
+    _cacheDuration: 10 * 60 * 1000, // 10 minutos de caché (ajustable)
+
     /**
-     * Lista todas las imágenes de un vehículo
-     * @param {number} vehicleId - ID del vehículo
-     * @returns {Promise<string[]>} - Array con nombres de imágenes
+     * Lista todas las imágenes de un vehículo con caché inteligente
      */
     listVehicleImages(vehicleId) {
+        const now = Date.now();
+
+        // Devolver desde caché si está disponible y no ha expirado
+        if (this._imageCache.has(vehicleId) && 
+            now - this._cacheTimestamp < this._cacheDuration) {
+            return Promise.resolve(this._imageCache.get(vehicleId));
+        }
+
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: "GET",
                 url: Config.getFullUrl(`/open/file/vehicle/${vehicleId}`),
                 dataType: "json",
-                statusCode: {
-                    200: (data) => resolve(data),
-                    400: () => reject("ID de vehículo requerido"),
-                    500: () => reject("Error al listar imágenes del vehículo")
+                success: (data) => {
+                    const images = data || [];
+                    this._imageCache.set(vehicleId, images);
+                    if (images.length > 0) {
+                        this._thumbCache.set(vehicleId, images[0]);
+                    }
+                    this._cacheTimestamp = now;
+                    resolve(images);
+                },
+                error: (xhr) => {
+                    console.warn(`Error listando imágenes del vehículo ${vehicleId}: ${xhr.status}`);
+                    // En caso de rate limit o error, devolvemos array vacío para no romper la UI
+                    this._imageCache.set(vehicleId, []);
+                    resolve([]);
                 }
             });
         });
     },
 
     /**
-     * Obtiene la URL completa de una imagen de vehículo
-     * @param {number} vehicleId - ID del vehículo
-     * @param {string} imageName - Nombre de la imagen
-     * @returns {string} - URL completa de la imagen
+     * Obtiene solo el thumbnail (más eficiente para listas grandes)
      */
+    getVehicleThumbnail(vehicleId) {
+        if (this._thumbCache.has(vehicleId)) {
+            return Promise.resolve(this._thumbCache.get(vehicleId));
+        }
+        return this.listVehicleImages(vehicleId).then(images => 
+            images.length > 0 ? images[0] : null
+        );
+    },
+
+    /**
+     * Invalida todo el caché (usar después de subir o eliminar imagen)
+     */
+    invalidateCache() {
+        this._imageCache.clear();
+        this._thumbCache.clear();
+        this._cacheTimestamp = 0;
+        console.log("Caché de imágenes invalidado");
+    },
+
+    // ==================== MÉTODOS EXISTENTES ====================
+
     getVehicleImageUrl(vehicleId, imageName) {
         return Config.getFullUrl(`/open/file/vehicle/${vehicleId}/${imageName}`);
     },
 
-    /**
-     * Obtiene los datos binarios de una imagen de vehículo
-     * @param {number} vehicleId - ID del vehículo
-     * @param {string} imageName - Nombre de la imagen
-     * @returns {Promise<Blob>} - Blob con los datos de la imagen
-     */
     getVehicleImage(vehicleId, imageName) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -59,12 +93,6 @@ const ImageService = {
         });
     },
 
-    /**
-     * Sube una imagen para un vehículo
-     * @param {number} vehicleId - ID del vehículo
-     * @param {File} file - Archivo de imagen
-     * @returns {Promise<string>} - Mensaje de éxito
-     */
     uploadVehicleImage(vehicleId, file) {
         return new Promise((resolve, reject) => {
             if (!file) {
@@ -90,12 +118,6 @@ const ImageService = {
         });
     },
 
-    /**
-     * Elimina una imagen de un vehículo
-     * @param {number} vehicleId - ID del vehículo
-     * @param {string} imageName - Nombre de la imagen
-     * @returns {Promise<string>} - Mensaje de éxito
-     */
     deleteVehicleImage(vehicleId, imageName) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -110,20 +132,11 @@ const ImageService = {
         });
     },
 
-    /**
-     * Obtiene la URL del avatar de un usuario
-     * @param {number} userId - ID del usuario
-     * @returns {string} - URL completa del avatar
-     */
+    // Avatares (sin cambios)
     getUserAvatarUrl(userId) {
         return Config.getFullUrl(`/open/file/user-avatar/${userId}`);
     },
 
-    /**
-     * Obtiene el avatar de un usuario
-     * @param {number} userId - ID del usuario
-     * @returns {Promise<Blob>} - Blob con los datos del avatar
-     */
     getUserAvatar(userId) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -142,12 +155,6 @@ const ImageService = {
         });
     },
 
-    /**
-     * Sube un avatar para un usuario
-     * @param {number} userId - ID del usuario
-     * @param {File} file - Archivo de imagen
-     * @returns {Promise<string>} - Mensaje de éxito
-     */
     uploadUserAvatar(userId, file) {
         return new Promise((resolve, reject) => {
             if (!file) {
@@ -173,20 +180,10 @@ const ImageService = {
         });
     },
 
-    /**
-     * Obtiene la URL del avatar de un empleado
-     * @param {number} employeeId - ID del empleado
-     * @returns {string} - URL completa del avatar
-     */
     getEmployeeAvatarUrl(employeeId) {
         return Config.getFullUrl(`/open/file/employee-avatar/${employeeId}`);
     },
 
-    /**
-     * Obtiene el avatar de un empleado
-     * @param {number} employeeId - ID del empleado
-     * @returns {Promise<Blob>} - Blob con los datos del avatar
-     */
     getEmployeeAvatar(employeeId) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -205,12 +202,6 @@ const ImageService = {
         });
     },
 
-    /**
-     * Sube un avatar para un empleado
-     * @param {number} employeeId - ID del empleado
-     * @param {File} file - Archivo de imagen
-     * @returns {Promise<string>} - Mensaje de éxito
-     */
     uploadEmployeeAvatar(employeeId, file) {
         return new Promise((resolve, reject) => {
             if (!file) {
@@ -235,7 +226,6 @@ const ImageService = {
             });
         });
     }
-
 };
 
 export default ImageService;
