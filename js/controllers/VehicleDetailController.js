@@ -31,10 +31,11 @@ export class VehicleDetailController {
 
         try {
             const vehicle = await VehicleService.findById(vehicleId);
-            this.view.render(vehicle);
+            // Ahora render es async para cargar las imágenes
+            await this.view.render(vehicle);
         } catch (error) {
             console.error("Error cargando vehículo:", error);
-            modal.classList.remove("show");
+            modal.classList.remove("active");
         }
     }
 

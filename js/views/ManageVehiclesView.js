@@ -1,7 +1,5 @@
-/**
- * Vista para gestionar vehículos (CRUD completo con imágenes)
- * Solo para empleados
- */
+import ImageService from "../services/ImageService.js";
+
 export class ManageVehiclesView {
     constructor() {
         this.containerSelector = "#manage-vehicles-view";
@@ -13,10 +11,14 @@ export class ManageVehiclesView {
             this.$container.style.display = "none";
             document.querySelector("main").appendChild(this.$container);
         }
+        this.vehicleImages = new Map();
     }
 
-    render(vehicles = []) {
+    async render(vehicles = []) {
         if (!this.$container) return;
+
+        // Cargar primera imagen de cada vehículo
+        await this.loadVehicleImages(vehicles);
 
         this.$container.innerHTML = `
             <div class="manage-vehicles-container">
@@ -50,6 +52,22 @@ export class ManageVehiclesView {
         `;
     }
 
+    async loadVehicleImages(vehicles) {
+        this.vehicleImages.clear();
+        await Promise.all(
+            vehicles.map(async (v) => {
+                try {
+                    const images = await ImageService.listVehicleImages(v.vehicleId);
+                    if (images && images.length > 0) {
+                        this.vehicleImages.set(v.vehicleId, images[0]);
+                    }
+                } catch (error) {
+                    console.warn(`No images for vehicle ${v.vehicleId}`);
+                }
+            })
+        );
+    }
+
     renderVehiclesRows(vehicles) {
         if (!vehicles || vehicles.length === 0) {
             return `
@@ -64,9 +82,7 @@ export class ManageVehiclesView {
         return vehicles.map(v => `
             <tr data-vehicle-id="${v.vehicleId}">
                 <td>
-                    <div class="vehicle-thumb-placeholder">
-                        ${v.brand.charAt(0)}${v.model.charAt(0)}
-                    </div>
+                    ${this.renderVehicleThumb(v)}
                 </td>
                 <td>${v.brand}</td>
                 <td>${v.model}</td>
@@ -91,6 +107,29 @@ export class ManageVehiclesView {
                 </td>
             </tr>
         `).join('');
+    }
+
+    renderVehicleThumb(vehicle) {
+        const imageName = this.vehicleImages.get(vehicle.vehicleId);
+        
+        if (imageName) {
+            const imageUrl = ImageService.getVehicleImageUrl(vehicle.vehicleId, imageName);
+            return `
+                <img src="${imageUrl}" 
+                     alt="${vehicle.brand} ${vehicle.model}"
+                     class="vehicle-thumb"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="vehicle-thumb-placeholder" style="display: none;">
+                    ${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}
+                </div>
+            `;
+        } else {
+            return `
+                <div class="vehicle-thumb-placeholder">
+                    ${vehicle.brand.charAt(0)}${vehicle.model.charAt(0)}
+                </div>
+            `;
+        }
     }
 
     renderVehicleForm(vehicle = null) {
@@ -199,7 +238,7 @@ export class ManageVehiclesView {
     renderImagesGrid(vehicleId, images) {
         return images.map(imageName => `
             <div class="image-card" data-image-name="${imageName}">
-                <img src="${this.getImageUrl(vehicleId, imageName)}" 
+                <img src="${ImageService.getVehicleImageUrl(vehicleId, imageName)}" 
                      alt="${imageName}"
                      class="gallery-image">
                 <div class="image-actions">
@@ -213,11 +252,6 @@ export class ManageVehiclesView {
                 <p class="image-name">${imageName}</p>
             </div>
         `).join('');
-    }
-
-    getImageUrl(vehicleId, imageName) {
-        // Usa la función del ImageService
-        return `${window.location.origin}/rentexpress-rest-api/api/open/file/vehicle/${vehicleId}/${imageName}`;
     }
 
     getFormData() {
