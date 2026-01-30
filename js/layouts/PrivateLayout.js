@@ -1,5 +1,9 @@
 import sessionController from "../controllers/SessionController.js";
 
+/**
+ * Layout privado (con autenticación)
+ * SOLO renderiza HTML y gestiona event listeners
+ */
 export class PrivateLayout {
     constructor() {
         this.headerSelector = "header";
@@ -7,12 +11,18 @@ export class PrivateLayout {
         this.sidebarSelector = "#sidebar";
     }
 
+    /**
+     * Renderizar el layout completo
+     */
     render() {
         this.renderHeader();
         this.renderSidebar();
         this.renderFooter();
     }
 
+    /**
+     * Renderizar el header privado
+     */
     renderHeader() {
         const header = document.querySelector(this.headerSelector);
         if (!header) return;
@@ -36,14 +46,20 @@ export class PrivateLayout {
         `;
     }
 
+    /**
+     * Renderizar el sidebar
+     */
     renderSidebar() {
         const user = sessionController.getLoggedInUser();
         const isEmployee = user?.loginType === "employee";
 
         let sidebar = document.querySelector(this.sidebarSelector);
         
+        // Crear sidebar si no existe
         if (!sidebar) {
             const main = document.querySelector("main");
+            if (!main) return;
+
             sidebar = document.createElement("aside");
             sidebar.id = "sidebar";
             sidebar.className = "sidebar";
@@ -67,6 +83,9 @@ export class PrivateLayout {
         `;
     }
 
+    /**
+     * Obtener menú para empleados
+     */
     getEmployeeMenu() {
         return [
             { hash: "#home", route: "home", icon: "🏠", text: "Inicio" },
@@ -75,6 +94,9 @@ export class PrivateLayout {
         ];
     }
 
+    /**
+     * Obtener menú para usuarios
+     */
     getUserMenu() {
         return [
             { hash: "#home", route: "home", icon: "🏠", text: "Inicio" },
@@ -82,12 +104,19 @@ export class PrivateLayout {
         ];
     }
 
+    /**
+     * Renderizar el footer privado
+     */
     renderFooter() {
         let footer = document.querySelector(this.footerSelector);
         
+        // Crear footer si no existe
         if (!footer) {
             footer = document.createElement("footer");
-            document.getElementById("app").appendChild(footer);
+            const app = document.getElementById("app");
+            if (app) {
+                app.appendChild(footer);
+            }
         }
 
         footer.innerHTML = `
@@ -108,43 +137,71 @@ export class PrivateLayout {
         `;
     }
 
-    setupEventListeners(logoutCallback, router) {
+    /**
+     * Configurar event listeners
+     * @param {Function} onLogout - Callback para el botón de logout
+     * @param {Object} router - Instancia del router para actualizar sidebar
+     */
+    setupEventListeners(onLogout, router) {
+        // Listener para logout
         const btnLogout = document.getElementById("btnLogout");
-        if (btnLogout && logoutCallback) {
-            btnLogout.addEventListener("click", (e) => {
+        if (btnLogout && onLogout) {
+            // Eliminar listeners anteriores
+            const newBtn = btnLogout.cloneNode(true);
+            btnLogout.parentNode.replaceChild(newBtn, btnLogout);
+            
+            // Agregar nuevo listener
+            newBtn.addEventListener("click", (e) => {
                 e.preventDefault();
-                logoutCallback();
+                onLogout();
             });
         }
 
+        // Actualizar el estado activo del sidebar según la ruta actual
         if (router) {
-            const currentHash = window.location.hash.slice(1) || 'home';
-            document.querySelectorAll(".sidebar-link").forEach(link => {
-                const route = link.dataset.route;
-                if (route === currentHash) {
-                    link.classList.add("active");
-                } else {
-                    link.classList.remove("active");
-                }
-            });
+            this.updateSidebarActiveState(router);
         }
     }
 
+    /**
+     * Actualizar el estado activo del sidebar
+     */
+    updateSidebarActiveState(router) {
+        const currentHash = window.location.hash.slice(1) || 'home';
+        
+        document.querySelectorAll(".sidebar-link").forEach(link => {
+            const route = link.dataset.route;
+            if (route === currentHash) {
+                link.classList.add("active");
+            } else {
+                link.classList.remove("active");
+            }
+        });
+    }
+
+    /**
+     * Mostrar el layout
+     */
     show() {
         const header = document.querySelector(this.headerSelector);
         const footer = document.querySelector(this.footerSelector);
         const sidebar = document.querySelector(this.sidebarSelector);
+        
         if (header) header.style.display = "flex";
         if (footer) footer.style.display = "block";
         if (sidebar) sidebar.style.display = "block";
     }
 
+    /**
+     * Ocultar el layout
+     */
     hide() {
         const header = document.querySelector(this.headerSelector);
         const footer = document.querySelector(this.footerSelector);
         const sidebar = document.querySelector(this.sidebarSelector);
+        
         if (header) header.style.display = "none";
-        if (footer) footer.style.display = "none";
+        if (footer) header.style.display = "none";
         if (sidebar) sidebar.style.display = "none";
     }
 }

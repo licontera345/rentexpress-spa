@@ -1,91 +1,122 @@
 import LoginService from "../services/LoginService.js";
 import sessionController from "./SessionController.js";
 
+/**
+ * Controlador del modal de login
+ * NO hereda de BaseController porque es un modal (componente global)
+ */
 export class LoginController {
-    constructor(view, router) {
+    constructor(view) {
         this.view = view;
-        this.router = router;
+        this.router = null;
         this.modal = document.getElementById("loginModal");
+        
+        this.initialize();
     }
 
-    init() {
+    /**
+     * Inicializar el controlador
+     */
+    initialize() {
+        // Renderizar la vista
         this.view.render();
-        this.setupModalListeners();  
-        this.setupFormListeners();  
+
+        // Configurar listeners del modal
+        this.setupModalListeners();
+
+        // Configurar listeners del formulario
+        this.setupFormListeners();
     }
 
+    /**
+     * Configurar listeners del modal
+     */
     setupModalListeners() {
-        // Cerrar modal con la X
-        const closeBtn = this.modal?.querySelector(".btn-close");
+        if (!this.modal) {
+            console.error('Modal de login no encontrado');
+            return;
+        }
+
+        // Cerrar con botón X
+        const closeBtn = this.modal.querySelector(".btn-close");
         if (closeBtn) {
             closeBtn.addEventListener("click", () => {
-                this.hide();
+                this.hideModal();
             });
         }
 
-        // Cerrar modal clicando fuera
-        if (this.modal) {
-            this.modal.addEventListener("click", (e) => {
-                if (e.target === this.modal) {
-                    this.hide();
-                }
-            });
-        }
-    }
-
-    // Eventos dentro del formulario de login
-    setupFormListeners() {
-        this.view.$container.addEventListener("click", async (e) => {
-            if (e.target.id === "loginButton") {
-                e.preventDefault();
-
-                const username = document.getElementById("username")?.value.trim();
-                const password = document.getElementById("password")?.value;
-                const type = document.querySelector('input[name="loginType"]:checked')?.value || "user";
-                const out = document.getElementById("login-result");
-
-                if (!username || !password) {
-                    if (out) {
-                        out.textContent = "Por favor, completa usuario y contraseña";
-                        out.style.color = "red";
-                    }
-                    return;
-                }
-
-                try {
-                    const data = (type === "user")
-                        ? await LoginService.loginUser({ username, password })
-                        : await LoginService.loginEmployee({ username, password });
-
-                    sessionController.setLoggedInUser({ username, loginType: type }, data.token);
-
-                    // Cerrar modal tras login exitoso
-                    this.hide();
-
-                    // Recargar la ruta actual para aplicar el layout privado
-                    if (this.router) {
-                        this.router.route();
-                    }
-
-                    console.log("✅ Login exitoso");
-                } catch (error) {
-                    if (out) {
-                        out.textContent = "Error: " + (error.message || "Credenciales inválidas");
-                        out.style.color = "red";
-                    }
-                }
+        // Cerrar con click fuera del modal
+        this.modal.addEventListener("click", (e) => {
+            if (e.target === this.modal) {
+                this.hideModal();
             }
         });
     }
 
     /**
-     * Maneja el logout (llamado desde LayoutManager)
+     * Configurar listeners del formulario
+     */
+    setupFormListeners() {
+        const container = this.view.$container;
+        if (!container) return;
+
+        container.addEventListener("click", async (e) => {
+            if (e.target.id === "loginButton") {
+                e.preventDefault();
+                await this.handleLogin();
+            }
+        });
+    }
+
+    /**
+     * Manejar el proceso de login
+     */
+    async handleLogin() {
+        const username = document.getElementById("username")?.value.trim();
+        const password = document.getElementById("password")?.value;
+        const type = document.querySelector('input[name="loginType"]:checked')?.value || "user";
+
+        // Validar campos
+        if (!username || !password) {
+            this.showError("Por favor, completa usuario y contraseña");
+            return;
+        }
+
+        console.log(`🔐 Intentando login como ${type}: ${username}`);
+
+        try {
+            // Llamar al servicio de login
+            const data = (type === "user")
+                ? await LoginService.loginUser({ username, password })
+                : await LoginService.loginEmployee({ username, password });
+
+            // Guardar sesión
+            sessionController.setLoggedInUser({ username, loginType: type }, data.token);
+
+            console.log("✅ Login exitoso");
+
+            // Cerrar modal
+            this.hideModal();
+
+            // Recargar la ruta actual para aplicar el layout privado
+            if (this.router) {
+                this.router.route();
+            }
+        } catch (error) {
+            console.error("❌ Error en login:", error);
+            this.showError("Error: " + (error.message || "Credenciales inválidas"));
+        }
+    }
+
+    /**
+     * Manejar el logout
      */
     handleLogout() {
+        console.log("🚪 Cerrando sesión");
+
         sessionController.logOut();
         
-        // Cerrar modal si estaba abierto
-        this.hide();
+        this.hideModal();
 
         // Ir a home y recargar layout
         if (this.router) {
@@ -95,12 +126,50 @@ export class LoginController {
         console.log("✅ Logout exitoso");
     }
 
-    show() {
-        this.modal?.classList.add("active");
-        this.view.render();
+    /**
+     * Mostrar mensaje de error
+     */
+    showError(message) {
+        const out = document.getElementById("login-result");
+        if (out) {
+            out.textContent = message;
+            out.style.color = "red";
+        }
     }
 
-    hide() {
-        this.modal?.classList.remove("active");
+    /**
+     * Limpiar mensaje de error
+     */
+    clearError() {
+        const out = document.getElementById("login-result");
+        if (out) {
+            out.textContent = "";
+        }
+    }
+
+    /**
+     * Mostrar el modal
+     */
+    showModal() {
+        if (this.modal) {
+            this.modal.classList.add("active");
+            this.clearError();
+            
+            // Limpiar campos
+            const username = document.getElementById("username");
+            const password = document.getElementById("password");
+            if (username) username.value = "";
+            if (password) password.value = "";
+        }
+    }
+
+    /**
+     * Ocultar el modal
+     */
+    hideModal() {
+        if (this.modal) {
+            this.modal.classList.remove("active");
+            this.clearError();
+        }
     }
 }

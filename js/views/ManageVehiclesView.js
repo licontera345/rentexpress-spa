@@ -1,18 +1,32 @@
+/**
+ * Vista de gestión de vehículos
+ * SOLO renderiza HTML, NO tiene lógica de negocio
+ */
 export class ManageVehiclesView {
     constructor() {
         this.containerSelector = "#manage-vehicles-view";
         this.$container = document.querySelector(this.containerSelector);
         
+        // Crear el contenedor si no existe
         if (!this.$container) {
             this.$container = document.createElement("section");
             this.$container.id = "manage-vehicles-view";
             this.$container.style.display = "none";
-            document.querySelector("main").appendChild(this.$container);
+            const main = document.querySelector("main");
+            if (main) {
+                main.appendChild(this.$container);
+            }
         }
     }
 
-    render(vehicles = []) {
+    /**
+     * Renderizar la vista de gestión de vehículos
+     * @param {Object} data - { vehicles: [] }
+     */
+    render(data = {}) {
         if (!this.$container) return;
+
+        const { vehicles = [] } = data;
 
         this.$container.innerHTML = `
             <div class="manage-vehicles-container">
@@ -46,44 +60,55 @@ export class ManageVehiclesView {
         `;
     }
 
+    /**
+     * Renderizar filas de la tabla
+     */
     renderVehiclesRows(vehicles) {
         if (!vehicles || vehicles.length === 0) {
             return `
                 <tr>
                     <td colspan="8" class="empty-state">
-                        No hay vehículos registrados
+                        No hay vehículos registrados. Haz clic en "Nuevo Vehículo" para agregar uno.
                     </td>
                 </tr>
             `;
         }
 
-        return vehicles.map(v => `
-            <tr data-vehicle-id="${v.vehicleId}">
+        return vehicles.map(v => this.renderVehicleRow(v)).join('');
+    }
+
+    /**
+     * Renderizar una fila de vehículo
+     */
+    renderVehicleRow(vehicle) {
+        return `
+            <tr data-vehicle-id="${vehicle.vehicleId}">
+                <td>${this.renderVehicleThumb(vehicle)}</td>
+                <td>${vehicle.brand}</td>
+                <td>${vehicle.model}</td>
+                <td>${vehicle.manufactureYear}</td>
+                <td>${vehicle.licensePlate}</td>
+                <td>${vehicle.dailyPrice}€</td>
                 <td>
-                    ${this.renderVehicleThumb(v)}
-                </td>
-                <td>${v.brand}</td>
-                <td>${v.model}</td>
-                <td>${v.manufactureYear}</td>
-                <td>${v.licensePlate}</td>
-                <td>${v.dailyPrice}€</td>
-                <td>
-                    <span class="status-badge ${v.activeStatus ? 'status-active' : 'status-inactive'}">
-                        ${v.activeStatus ? 'Activo' : 'Inactivo'}
+                    <span class="status-badge ${vehicle.activeStatus ? 'status-active' : 'status-inactive'}">
+                        ${vehicle.activeStatus ? 'Activo' : 'Inactivo'}
                     </span>
                 </td>
                 <td class="actions-cell">
-                    <button class="btn-icon btn-edit" data-vehicle-id="${v.vehicleId}" title="Editar">
+                    <button class="btn-icon btn-edit" data-vehicle-id="${vehicle.vehicleId}" title="Editar">
                         ✏️
                     </button>
-                    <button class="btn-icon btn-delete" data-vehicle-id="${v.vehicleId}" title="Eliminar">
+                    <button class="btn-icon btn-delete" data-vehicle-id="${vehicle.vehicleId}" title="Eliminar">
                         🗑️
                     </button>
                 </td>
             </tr>
-        `).join('');
+        `;
     }
 
+    /**
+     * Renderizar thumbnail del vehículo
+     */
     renderVehicleThumb(vehicle) {
         return `
             <div class="vehicle-thumb-placeholder">
@@ -92,6 +117,9 @@ export class ManageVehiclesView {
         `;
     }
 
+    /**
+     * Renderizar formulario de vehículo
+     */
     renderVehicleForm(vehicle = null) {
         return `
             <form id="vehicle-form" class="modal-form">
@@ -102,40 +130,45 @@ export class ManageVehiclesView {
                 <div class="form-row">
                     <div class="form-group">
                         <label>Marca *</label>
-                        <input type="text" name="brand" value="${vehicle?.brand || ''}" required>
+                        <input type="text" name="brand" value="${vehicle?.brand || ''}" required placeholder="Ej: Toyota">
                     </div>
                     <div class="form-group">
                         <label>Modelo *</label>
-                        <input type="text" name="model" value="${vehicle?.model || ''}" required>
+                        <input type="text" name="model" value="${vehicle?.model || ''}" required placeholder="Ej: Corolla">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Año de fabricación *</label>
-                        <input type="number" name="manufactureYear" value="${vehicle?.manufactureYear || ''}" required>
+                        <input type="number" name="manufactureYear" value="${vehicle?.manufactureYear || ''}" 
+                               required min="1900" max="${new Date().getFullYear() + 1}" placeholder="2024">
                     </div>
                     <div class="form-group">
                         <label>Matrícula *</label>
-                        <input type="text" name="licensePlate" value="${vehicle?.licensePlate || ''}" required>
+                        <input type="text" name="licensePlate" value="${vehicle?.licensePlate || ''}" 
+                               required placeholder="1234ABC">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>VIN *</label>
-                        <input type="text" name="vinNumber" value="${vehicle?.vinNumber || ''}" required>
+                        <label>VIN (Número de bastidor) *</label>
+                        <input type="text" name="vinNumber" value="${vehicle?.vinNumber || ''}" 
+                               required placeholder="1HGBH41JXMN109186">
                     </div>
                     <div class="form-group">
                         <label>Kilometraje actual *</label>
-                        <input type="number" name="currentMileage" value="${vehicle?.currentMileage || ''}" required>
+                        <input type="number" name="currentMileage" value="${vehicle?.currentMileage || ''}" 
+                               required min="0" placeholder="50000">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Precio por día (€) *</label>
-                        <input type="number" step="0.01" name="dailyPrice" value="${vehicle?.dailyPrice || ''}" required>
+                        <input type="number" step="0.01" name="dailyPrice" value="${vehicle?.dailyPrice || ''}" 
+                               required min="0" placeholder="45.00">
                     </div>
                     <div class="form-group">
                         <label>Estado</label>
@@ -148,12 +181,17 @@ export class ManageVehiclesView {
 
                 <div class="form-actions">
                     <button type="button" id="btn-cancel-form" class="btn btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="submit" class="btn btn-success">
+                        ${vehicle ? '💾 Actualizar' : '➕ Crear'} Vehículo
+                    </button>
                 </div>
             </form>
         `;
     }
 
+    /**
+     * Obtener datos del formulario
+     */
     getFormData() {
         const form = document.getElementById('vehicle-form');
         if (!form) return null;
@@ -162,43 +200,59 @@ export class ManageVehiclesView {
         const data = {};
 
         for (let [key, value] of formData.entries()) {
+            // Omitir vehicleId si está vacío (nuevo vehículo)
             if (key === 'vehicleId' && !value) {
                 continue;
             }
+
+            // Convertir tipos
             if (key === 'activeStatus') {
                 data[key] = value === 'true';
             } else if (key === 'manufactureYear' || key === 'currentMileage') {
-                data[key] = parseInt(value);
+                data[key] = parseInt(value, 10);
             } else if (key === 'dailyPrice') {
                 data[key] = parseFloat(value);
             } else {
-                data[key] = value;
+                data[key] = value.trim();
             }
         }
 
         return data;
     }
 
+    /**
+     * Mostrar mensaje de feedback
+     */
     showMessage(message, type = 'success') {
         const container = this.$container.querySelector('.manage-vehicles-container');
         if (!container) return;
 
+        // Eliminar mensajes anteriores
+        const existingMessages = container.querySelectorAll('.message');
+        existingMessages.forEach(msg => msg.remove());
+
+        // Crear nuevo mensaje
         const messageEl = document.createElement('div');
         messageEl.className = `message message-${type}`;
         messageEl.textContent = message;
         
         container.insertBefore(messageEl, container.firstChild);
 
+        // Auto-eliminar después de 4 segundos
         setTimeout(() => {
             messageEl.remove();
-        }, 3000);
+        }, 4000);
     }
 
     show() {
-        if (this.$container) this.$container.style.display = "block";
+        if (this.$container) {
+            this.$container.style.display = "block";
+        }
     }
 
     hide() {
-        if (this.$container) this.$container.style.display = "none";
+        if (this.$container) {
+            this.$container.style.display = "none";
+        }
     }
 }

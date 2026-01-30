@@ -1,14 +1,26 @@
+/**
+ * Layout público (sin autenticación)
+ * SOLO renderiza HTML y gestiona event listeners
+ */
 export class PublicLayout {
     constructor() {
         this.headerSelector = "header";
         this.footerSelector = "footer";
+        this.sidebarSelector = "#sidebar";
     }
 
+    /**
+     * Renderizar el layout completo
+     */
     render() {
         this.renderHeader();
         this.renderFooter();
+        this.removeSidebar(); // Asegurar que no hay sidebar en público
     }
 
+    /**
+     * Renderizar el header público
+     */
     renderHeader() {
         const header = document.querySelector(this.headerSelector);
         if (!header) return;
@@ -20,17 +32,25 @@ export class PublicLayout {
             </div>
             <nav>
                 <a href="#home" class="nav-link">Inicio</a>
+                <a href="#catalog" class="nav-link">Catálogo</a>
                 <a href="#" id="btnLogin" class="nav-link nav-link-primary">Iniciar Sesión</a>
             </nav>
         `;
     }
 
+    /**
+     * Renderizar el footer público
+     */
     renderFooter() {
         let footer = document.querySelector(this.footerSelector);
         
+        // Crear footer si no existe
         if (!footer) {
             footer = document.createElement("footer");
-            document.getElementById("app").appendChild(footer);
+            const app = document.getElementById("app");
+            if (app) {
+                app.appendChild(footer);
+            }
         }
 
         footer.innerHTML = `
@@ -56,26 +76,54 @@ export class PublicLayout {
         `;
     }
 
-    setupEventListeners(loginController) {
+    /**
+     * Eliminar sidebar si existe
+     */
+    removeSidebar() {
+        const sidebar = document.querySelector(this.sidebarSelector);
+        if (sidebar) {
+            sidebar.remove();
+        }
+    }
+
+    /**
+     * Configurar event listeners
+     * @param {Function} onLoginClick - Callback para el botón de login
+     */
+    setupEventListeners(onLoginClick) {
         const btnLogin = document.getElementById("btnLogin");
-        if (btnLogin && loginController) {
-            btnLogin.addEventListener("click", (e) => {
+        
+        if (btnLogin && onLoginClick) {
+            // Eliminar listeners anteriores
+            const newBtn = btnLogin.cloneNode(true);
+            btnLogin.parentNode.replaceChild(newBtn, btnLogin);
+            
+            // Agregar nuevo listener
+            newBtn.addEventListener("click", (e) => {
                 e.preventDefault();
-                loginController.show();
+                onLoginClick();
             });
         }
     }
 
+    /**
+     * Mostrar el layout
+     */
     show() {
         const header = document.querySelector(this.headerSelector);
         const footer = document.querySelector(this.footerSelector);
+        
         if (header) header.style.display = "flex";
         if (footer) footer.style.display = "block";
     }
 
+    /**
+     * Ocultar el layout
+     */
     hide() {
         const header = document.querySelector(this.headerSelector);
         const footer = document.querySelector(this.footerSelector);
+        
         if (header) header.style.display = "none";
         if (footer) footer.style.display = "none";
     }

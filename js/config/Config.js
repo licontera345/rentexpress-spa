@@ -4,7 +4,7 @@
  */
 const Config = {
     // URL base de la API
-    API_BASE_URL: "http://94.130.104.92:8084/rentexpress-rest-api/api",
+    API_BASE_URL: "https://94.130.104.92:8443/rentexpress-rest-api/api",
     // API_BASE_URL: "http://localhost:8080/rentexpress-rest-api/api",
 
     // Endpoints de Autenticación

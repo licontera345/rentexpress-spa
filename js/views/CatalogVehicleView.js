@@ -1,3 +1,7 @@
+/**
+ * Vista del catálogo de vehículos
+ * SOLO renderiza HTML, NO tiene lógica de negocio
+ */
 export class CatalogVehicleView {
     constructor() {
         this.containerSelector = "#catalog-section";
@@ -6,44 +10,62 @@ export class CatalogVehicleView {
         this.countElement = document.querySelector("#vehicle-count");
     }
 
-    render(vehicles) {
+    /**
+     * Renderizar el catálogo de vehículos
+     * @param {Object} data - { vehicles: [] }
+     */
+    render(data) {
         if (!this.$container) return;
+
+        const { vehicles = [] } = data;
 
         this.$container.style.display = "block";
 
-        if (!vehicles || vehicles.length === 0) {
-            if (this.listContainer) this.listContainer.innerHTML = `
-                <li class="catalog-empty">No hay vehículos disponibles</li>
-            `;
-            if (this.countElement) this.countElement.textContent = "0 vehículos";
-            return;
+        // Actualizar contador
+        if (this.countElement) {
+            this.countElement.textContent = `${vehicles.length} vehículo${vehicles.length !== 1 ? 's' : ''}`;
         }
 
+        // Renderizar lista
         if (this.listContainer) {
-            this.listContainer.innerHTML = vehicles.map(v => `
-                <li class="catalog-item" data-vehicle-id="${v.vehicleId}">
-                    ${this.renderVehiclePlaceholder(v)}
-                    <div class="vehicle-card">
-                        <div class="vehicle-header">
-                            <span class="vehicle-name">${v.brand} ${v.model}</span>
-                            <span class="vehicle-year">${v.manufactureYear}</span>
-                        </div>
-                        <div class="vehicle-info">
-                            <p><strong>Matrícula:</strong> ${v.licensePlate}</p>
-                            <p><strong>Kilometraje:</strong> ${v.currentMileage.toLocaleString()} km</p>
-                        </div>
-                        <div class="vehicle-price">
-                            <span class="price-label">Precio por día</span>
-                            <span class="price-value">${v.dailyPrice}€</span>
-                        </div>
-                    </div>
-                </li>
-            `).join("");
+            if (vehicles.length === 0) {
+                this.listContainer.innerHTML = `
+                    <li class="catalog-empty">No hay vehículos disponibles</li>
+                `;
+            } else {
+                this.listContainer.innerHTML = vehicles.map(v => this.renderVehicleCard(v)).join("");
+            }
         }
-
-        if (this.countElement) this.countElement.textContent = `${vehicles.length} vehículos`;
     }
 
+    /**
+     * Renderizar una tarjeta de vehículo
+     */
+    renderVehicleCard(vehicle) {
+        return `
+            <li class="catalog-item" data-vehicle-id="${vehicle.vehicleId}">
+                ${this.renderVehiclePlaceholder(vehicle)}
+                <div class="vehicle-card">
+                    <div class="vehicle-header">
+                        <span class="vehicle-name">${vehicle.brand} ${vehicle.model}</span>
+                        <span class="vehicle-year">${vehicle.manufactureYear}</span>
+                    </div>
+                    <div class="vehicle-info">
+                        <p><strong>Matrícula:</strong> ${vehicle.licensePlate}</p>
+                        <p><strong>Kilometraje:</strong> ${vehicle.currentMileage.toLocaleString()} km</p>
+                    </div>
+                    <div class="vehicle-price">
+                        <span class="price-label">Precio por día</span>
+                        <span class="price-value">${vehicle.dailyPrice}€</span>
+                    </div>
+                </div>
+            </li>
+        `;
+    }
+
+    /**
+     * Renderizar placeholder de imagen
+     */
     renderVehiclePlaceholder(vehicle) {
         return `
             <div class="vehicle-image-placeholder">
@@ -54,10 +76,14 @@ export class CatalogVehicleView {
     }
 
     show() {
-        if (this.$container) this.$container.style.display = "block";
+        if (this.$container) {
+            this.$container.style.display = "block";
+        }
     }
 
     hide() {
-        if (this.$container) this.$container.style.display = "none";
+        if (this.$container) {
+            this.$container.style.display = "none";
+        }
     }
 }

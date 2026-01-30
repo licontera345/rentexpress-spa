@@ -17,15 +17,24 @@ import { SearchVehicleController } from "./controllers/SearchVehicleController.j
 import { VehicleDetailController } from "./controllers/VehicleDetailController.js";
 import { ManageVehiclesController } from "./controllers/ManageVehiclesController.js";
 
+/**
+ * Gestor principal de la aplicación
+ * Responsabilidades:
+ * - Crear todas las vistas y controladores
+ * - Inyectar dependencias
+ * - Inicializar el router
+ */
 export class AppManager {
     constructor() {
         this.init();
     }
 
     init() {
-        console.log("Inicializando AppManager...");
+        console.log("🚀 Inicializando AppManager...");
 
-        //Crear todas las vistas
+        // ========================================
+        // 1. CREAR VISTAS (solo renderizado)
+        // ========================================
         const homeView = new HomeView();
         const loginView = new LoginView();
         const catalogView = new CatalogVehicleView();
@@ -33,29 +42,47 @@ export class AppManager {
         const detailView = new VehicleDetailView();
         const manageVehiclesView = new ManageVehiclesView();
 
-        //Crear el controlador del modal de detalle
-        const detailController = new VehicleDetailController(detailView, null);
+        // ========================================
+        // 2. CREAR CONTROLADORES GLOBALES (modales y componentes)
+        // ========================================
+        
+        // Modal de login
+        const loginController = new LoginController(loginView);
 
-        //Crear controladores que dependen del modal
-        const catalogController = new CatalogVehicleController(catalogView, detailController, null);
+        // Modal de detalle de vehículo
+        const detailController = new VehicleDetailController(detailView);
 
-        //Crear los demás controladores
-        const homeController = new HomeController(homeView, null);
-        const loginController = new LoginController(loginView, null);
-        const searchController = new SearchVehicleController(searchView, catalogController, null);
-        const manageVehiclesController = new ManageVehiclesController(manageVehiclesView, null);
+        // Panel de búsqueda (componente global)
+        const catalogController = new CatalogVehicleController(catalogView, detailController);
+        const searchController = new SearchVehicleController(searchView, catalogController);
 
-        //Crear LayoutManager
-        const layoutManager = new LayoutManager(loginController, null);
+        // ========================================
+        // 3. CREAR CONTROLADORES DE RUTAS
+        // ========================================
+        
+        // Home (con panel de búsqueda)
+        const homeController = new HomeController(homeView, searchController);
 
-        //Crear el router SOLO con las rutas que existen
+        // Gestión de vehículos (solo empleados)
+        const manageVehiclesController = new ManageVehiclesController(manageVehiclesView);
+
+        // ========================================
+        // 4. CREAR LAYOUT MANAGER
+        // ========================================
+        const layoutManager = new LayoutManager(loginController);
+
+        // ========================================
+        // 5. CREAR ROUTER CON LAS RUTAS
+        // ========================================
         const router = new Router({
-            home: homeController,
-            catalog: catalogController,
+            'home': homeController,
+            'catalog': catalogController,
             'manage-vehicles': manageVehiclesController
         }, layoutManager);
 
-        //Inyectar el router en todos los controladores y en layoutManager
+        // ========================================
+        // 6. INYECTAR ROUTER EN TODOS LOS CONTROLADORES
+        // ========================================
         homeController.router = router;
         catalogController.router = router;
         loginController.router = router;
@@ -64,14 +91,12 @@ export class AppManager {
         manageVehiclesController.router = router;
         layoutManager.router = router;
 
-        //Inicializar componentes globales
-        loginController.init();
-        searchController.init();
-        detailController.init();
-
-        //Iniciar el routing
+        // ========================================
+        // 7. INICIAR EL ROUTING
+        // ========================================
         router.route();
 
-        console.log("AppManager inicializado correctamente");
+        console.log("✅ AppManager inicializado correctamente");
+        console.log("📌 Rutas disponibles:", Object.keys(router.routes));
     }
 }

@@ -1,31 +1,36 @@
-import AddressService from "../services/AddressService.js";
-import sessionController from "../controllers/SessionController.js";
-
+/**
+ * Vista del panel de búsqueda de vehículos
+ * SOLO renderiza HTML, NO tiene lógica de negocio
+ */
 export class SearchVehicleView {
     constructor() {
         this.containerSelector = "#search-panel";
         this.$container = document.querySelector(this.containerSelector);
     }
 
-    render(headquarters, categories = []) {
+    /**
+     * Renderizar el panel de búsqueda
+     * @param {Object} data - { headquarters: [], categories: [] }
+     */
+    render(data) {
         if (!this.$container) return;
 
-        const options = headquarters.map(hq => {
-            return `
-                <option value="${hq.id}"
-                    data-name="${hq.name || ''}"
-                    data-address-id="${hq.addressId || ''}">
-                    ${hq.name}
-                </option>
-            `;
-        }).join("");
+        const { headquarters = [], categories = [] } = data;
+
+        const hqOptions = headquarters.map(hq => `
+            <option value="${hq.id}"
+                data-name="${hq.name || ''}"
+                data-address-id="${hq.addressId || ''}">
+                ${hq.name}
+            </option>
+        `).join("");
 
         this.$container.innerHTML = `
             <div class="search-field-wrapper">
                 <label class="search-field-label">Lugar de recogida</label>
                 <select id="pickup-headquarters">
                     <option value="">Seleccionar</option>
-                    ${options}
+                    ${hqOptions}
                 </select>
             </div>
 
@@ -33,7 +38,7 @@ export class SearchVehicleView {
                 <label class="search-field-label">Lugar de devolución</label>
                 <select id="return-headquarters">
                     <option value="">Seleccionar</option>
-                    ${options}
+                    ${hqOptions}
                 </select>
             </div>
 
@@ -66,56 +71,49 @@ export class SearchVehicleView {
         `;
     }
 
-    async showHeadquarterDetails(select, detailsId) {
-        const detailsElement = document.getElementById(detailsId);
-        if (!detailsElement) return;
+    /**
+     * Mostrar detalles de una sede
+     */
+    showDetails(elementId, data) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
 
-        const hqId = select.value;
-        if (!hqId) {
-            detailsElement.innerHTML = "";
-            detailsElement.style.display = "none";
-            return;
-        }
-
-        const selectedOption = Array.from(select.options).find(opt => opt.value === hqId);
-        if (!selectedOption) return;
-
-        const name = selectedOption.dataset.name || "Sede sin nombre";
-        const addressId = selectedOption.dataset.addressId;
+        const { name, address } = data;
 
         let html = `<strong>${name}</strong><br>`;
 
-        if (!addressId) {
+        if (!address) {
             html += "<em>Dirección no disponible</em>";
         } else {
-            // Intentamos cargar la dirección solo si hay token
-            const token = sessionController.getToken ? sessionController.getToken() : sessionController.token;
-            if (token) {
-                try {
-                    const addr = await AddressService.findById(addressId, token);
+            const addressLine = [address.street, address.number].filter(Boolean).join(" ").trim();
+            if (addressLine) html += addressLine + "<br>";
 
-                    const addressLine = [addr.street, addr.number].filter(Boolean).join(" ").trim();
-                    if (addressLine) html += addressLine + "<br>";
+            const locationLine = [address.cityName, address.provinceName].filter(Boolean).join(", ").trim();
+            if (locationLine) html += locationLine;
 
-                    const locationLine = [addr.cityName, addr.provinceName].filter(Boolean).join(", ").trim();
-                    if (locationLine) html += locationLine;
-
-                    if (!addressLine && !locationLine) {
-                        html += "<em>Dirección no disponible</em>";
-                    }
-                } catch (e) {
-                    console.error("Error al cargar dirección:", e);
-                    html += "<em>Error al cargar la dirección</em>";
-                }
-            } else {
-                html += "<em>Inicia sesión como empleado para ver la dirección</em>";
+            if (!addressLine && !locationLine) {
+                html += "<em>Dirección no disponible</em>";
             }
         }
 
-        detailsElement.innerHTML = html;
-        detailsElement.style.display = "block";
+        element.innerHTML = html;
+        element.style.display = "block";
     }
 
+    /**
+     * Ocultar detalles de una sede
+     */
+    hideDetails(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        element.innerHTML = "";
+        element.style.display = "none";
+    }
+
+    /**
+     * Obtener los parámetros de búsqueda del formulario
+     */
     getSearchParams() {
         return {
             pickupHeadquartersId: document.getElementById("pickup-headquarters")?.value || "",
@@ -127,11 +125,15 @@ export class SearchVehicleView {
         };
     }
 
-    show() { 
-        if (this.$container) this.$container.style.display = "block"; 
+    show() {
+        if (this.$container) {
+            this.$container.style.display = "flex";
+        }
     }
 
-    hide() { 
-        if (this.$container) this.$container.style.display = "none"; 
+    hide() {
+        if (this.$container) {
+            this.$container.style.display = "none";
+        }
     }
 }
